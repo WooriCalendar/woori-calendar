@@ -1,16 +1,28 @@
 package com.ceojun7.wooricalendar.controller;
 
+import com.ceojun7.wooricalendar.dto.CalendarDTO;
 import com.ceojun7.wooricalendar.dto.EmailPostDTO;
 import com.ceojun7.wooricalendar.dto.EmailResponseDTO;
+import com.ceojun7.wooricalendar.dto.InviteDTO;
+import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.EmailMessageEntity;
+import com.ceojun7.wooricalendar.service.CalendarService;
 import com.ceojun7.wooricalendar.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.spi.CalendarNameProvider;
 
 import javax.mail.MessagingException;
 
@@ -20,10 +32,11 @@ import javax.mail.MessagingException;
  * @fileName : EmailController
  * @date : 2023-06-12
  * @description :
- * ===========================================================
- * DATE           AUTHOR             NOTE
- * -----------------------------------------------------------
- * 2023-06-12        DGeon             최초 생성
+ *              ===========================================================
+ *              DATE AUTHOR NOTE
+ *              -----------------------------------------------------------
+ *              2023-06-12 DGeon 최초 생성
+ *              2023-06-19 박현민 캘린더 공유 이메일 발송
  **/
 @RequestMapping("/sendmail")
 @RestController
@@ -31,7 +44,6 @@ import javax.mail.MessagingException;
 @Slf4j
 public class EmailController {
     private final EmailService emailService;
-
 
     /**
      * methodName : sendPasswordMail
@@ -44,7 +56,7 @@ public class EmailController {
      * @return response entity
      * @throws MessagingException the messaging exception
      */
-// 임시 비밀번호 발급
+    // 임시 비밀번호 발급
     @PostMapping("/password")
     public ResponseEntity<?> sendPasswordMail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
         log.warn(String.valueOf(emailPostDto));
@@ -88,5 +100,40 @@ public class EmailController {
         emailResponseDto.setCode(code);
         log.warn(code);
         return ResponseEntity.ok(emailResponseDto);
+    }
+
+    /**
+     * methodName : sendInviteMail
+     * comment : 캘린더 공유 메일 발송
+     * author : 박현민
+     * date : 2023-06-19
+     * description :
+     *
+     * @param emailPostDto the email post dto
+     * @param inviteDTO
+     * @return response entity
+     * @throws MessagingException the messaging exception
+     */
+    @PostMapping("/invite")
+    public ResponseEntity<?> sendInviteMail(@RequestBody InviteDTO inviteDTO, @AuthenticationPrincipal String email)
+            throws MessagingException {
+
+        log.warn("아이폰::::::::::" + String.valueOf(inviteDTO.getEmail()));
+        log.warn("아이폰::::::::::" + String.valueOf(email));
+        log.warn("아이폰::::::::::" + String.valueOf(inviteDTO.getCalNo()));
+
+        EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                .to(inviteDTO.getEmail())
+                .subject(email + "님이 캘린더를 공유했습니다.")
+                .build();
+
+        String code = emailService.sendMail(emailMessage, "invite");
+
+        EmailResponseDTO emailResponseDTO = new EmailResponseDTO();
+
+        emailResponseDTO.setCode(code);
+        log.warn(code);
+
+        return ResponseEntity.ok(emailResponseDTO);
     }
 }
