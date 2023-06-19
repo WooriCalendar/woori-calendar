@@ -141,9 +141,15 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
-    public String findByEmail(MemberDTO memberDTO){
-        MemberEntity memberEntity = memberRepository.findByEmail(memberDTO.getEmail());
-        return memberEntity.getEmail();
+//    public String findByEmail(MemberDTO memberDTO){
+//        MemberEntity memberEntity = memberRepository.findByEmail(memberDTO.getEmail());
+//        return memberEntity.getEmail();
+//    }
+
+    public MemberEntity findByEmail(String email){
+        MemberEntity memberEntity = memberRepository.findByEmail(email);
+        log.warn("서비스{}",memberEntity.getEmail());
+        return memberEntity;
     }
 
     public boolean updatePassword(String email, String password) {

@@ -36,13 +36,19 @@ public class MemberDTO {
 
 
     public MemberDTO(final MemberEntity  memberEntity) {
-        this.email = memberEntity.getEmail();
-        this.password = memberEntity.getPassword();
+        if(memberEntity.getPassword() != null) {
+            this.email = memberEntity.getEmail();
+            this.password = memberEntity.getPassword();
+        }else{
+            this.email = memberEntity.getEmail();
+        }
     }
 
     public static MemberEntity toEntity(final MemberDTO memberDTO) {
-        return  MemberEntity.builder().email(memberDTO.getEmail()).password(memberDTO.getPassword()).build();
+        if(memberDTO.getPassword() != null) {
+            return MemberEntity.builder().email(memberDTO.getEmail()).password(memberDTO.getPassword()).build();
+        }else{
+            return MemberEntity.builder().email(memberDTO.getEmail()).build();
+        }
     }
-
-
 }
