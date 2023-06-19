@@ -14,15 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author : DGeon
@@ -198,14 +193,24 @@ public class MemberController {
      *
      * @return response entity
      */
-    @GetMapping("signup")
-    public ResponseEntity<?> getEmailList(){
-        log.warn("email 중복검사 :: get호출됨");
-        List<String> entities = memberService.findeamil();
-        ResponseDTO<String> resp = ResponseDTO.<String>builder().data(entities).build();
-        log.warn("넘겨주는 값 확인 :::"+String.valueOf(ResponseEntity.ok().body(resp)));
-        return ResponseEntity.ok().body(resp);
+    @PostMapping("findemail")
+    public ResponseEntity<?> getEmail(@RequestBody MemberDTO memberDTO){
 
+
+//        log.warn(memberDTO.getEmail());
+//        String findemail = memberService.findByEmail(memberDTO.getEmail());
+//        log.warn(findemail);
+        try {
+            log.warn("email 중복검사 :: get호출됨 :: " + memberDTO.getEmail());
+            MemberEntity member = memberService.findByEmail(memberDTO.getEmail());
+            MemberDTO responseMemberDTO = memberDTO.builder()
+                    .email(member.getEmail())
+                    .build();
+            return ResponseEntity.ok().body(responseMemberDTO);
+        }catch(NullPointerException nullPointerException){
+            MemberDTO reMemberDTO = memberDTO.builder().build();
+            return ResponseEntity.ok().body(reMemberDTO);
+        }
     }
 
     @PutMapping("updatePassword")
@@ -217,5 +222,4 @@ public class MemberController {
         }
         return new ResponseEntity<>("회원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
     }
-
 }
