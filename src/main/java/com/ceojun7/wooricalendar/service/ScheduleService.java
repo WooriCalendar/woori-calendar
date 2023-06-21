@@ -48,8 +48,8 @@ public class ScheduleService {
         return scheduleRepository.findByCalendarEntity_CalNo(calendarEntity.getCalNo());
     }
 
-    public List<ScheduleEntity> retrieve(Long calNo) {
-        return scheduleRepository.findByCalendarEntity_CalNo(calNo);
+    public List<ScheduleEntity> retrieve(Long scNo) {
+        return scheduleRepository.findByScNo(scNo);
     }
 
     /**
