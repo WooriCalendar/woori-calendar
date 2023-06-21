@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -140,6 +141,37 @@ public class MemberController {
     }
 
     /**
+     * methodName : checkPassword
+     * comment : 패스워드 일치확인
+     * author : 강태수
+     * date : 2023-06-20
+     * description :
+     *
+     * @param MemberEntity
+     * @return the ResponseEntity
+     * 
+     */
+    @PostMapping("check")
+    public ResponseEntity<?> checkPassword(@RequestBody MemberDTO memberDTO) {
+        MemberEntity member = memberService.getByCredentials(memberDTO.getEmail(), memberDTO.getPassword(),
+                passwordEncoder);
+        log.info("{}", member);
+        return ResponseEntity.ok().body(member);
+        // if (member != null) {
+        // final MemberDTO responseUserDTO = memberDTO.builder()
+        // .email(member.getEmail())
+        // .password(member.getPassword())
+        // .build();
+        // return ResponseEntity.ok(responseUserDTO); // "비밀번호가 일치합니다. 123"
+        // } else {
+        // ResponseDTO responseDTO = ResponseDTO.builder()
+        // .error("Login failed")
+        // .build();
+        // return ResponseEntity.badRequest().body(responseDTO); // "비밀번호가 일치하지 않습니다."
+        // }
+    }
+
+    /**
      * methodName : getMemberByEmail
      * comment : 이메일로 회원 이 가지고있는 내용 조회
      * author : 강태수
@@ -151,8 +183,8 @@ public class MemberController {
      * 
      */
 
-    @GetMapping("/{email}")
-    public ResponseEntity<MemberDTO> getMemberByEmail(@PathVariable String email) {
+    @GetMapping
+    public ResponseEntity<MemberDTO> getMemberByEmail(@AuthenticationPrincipal String email) {
         MemberDTO memberDTO = memberService.getMemberByEmail(email);
         if (memberDTO != null) {
             return new ResponseEntity<>(memberDTO, HttpStatus.OK);
@@ -172,8 +204,8 @@ public class MemberController {
      * 
      */
 
-    @PutMapping("/{email}")
-    public ResponseEntity<String> updateMember(@PathVariable String email,
+    @PutMapping
+    public ResponseEntity<String> updateMember(@AuthenticationPrincipal String email,
             @RequestHeader("Authorization") String token,
             @RequestBody MemberDTO memberDTO) {
 
@@ -194,12 +226,11 @@ public class MemberController {
      * @return response entity
      */
     @PostMapping("findemail")
-    public ResponseEntity<?> getEmail(@RequestBody MemberDTO memberDTO){
+    public ResponseEntity<?> getEmail(@RequestBody MemberDTO memberDTO) {
 
-
-//        log.warn(memberDTO.getEmail());
-//        String findemail = memberService.findByEmail(memberDTO.getEmail());
-//        log.warn(findemail);
+        // log.warn(memberDTO.getEmail());
+        // String findemail = memberService.findByEmail(memberDTO.getEmail());
+        // log.warn(findemail);
         try {
             log.warn("email 중복검사 :: get호출됨 :: " + memberDTO.getEmail());
             MemberEntity member = memberService.findByEmail(memberDTO.getEmail());
@@ -207,7 +238,7 @@ public class MemberController {
                     .email(member.getEmail())
                     .build();
             return ResponseEntity.ok().body(responseMemberDTO);
-        }catch(NullPointerException nullPointerException){
+        } catch (NullPointerException nullPointerException) {
             MemberDTO reMemberDTO = memberDTO.builder().build();
             return ResponseEntity.ok().body(reMemberDTO);
         }
@@ -216,7 +247,8 @@ public class MemberController {
     @PutMapping("updatePassword")
     public ResponseEntity<String> updatePassword(@RequestBody MemberDTO memberDTO) {
 
-        boolean updated = memberService.updatePassword(memberDTO.getEmail(), passwordEncoder.encode(memberDTO.getPassword()));
+        boolean updated = memberService.updatePassword(memberDTO.getEmail(),
+                passwordEncoder.encode(memberDTO.getPassword()));
         if (updated) {
             return new ResponseEntity<>("회원 정보가 성공적으로 업데이트되었습니다.", HttpStatus.OK);
         }
