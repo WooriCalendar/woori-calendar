@@ -148,7 +148,7 @@ public class MemberController {
      * description :
      *
      * @param MemberEntity
-     * @return ResponseEntity
+     * @return the ResponseEntity
      * 
      */
     @PostMapping("check")
