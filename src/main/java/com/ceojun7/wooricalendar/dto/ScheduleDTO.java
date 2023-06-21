@@ -2,7 +2,6 @@ package com.ceojun7.wooricalendar.dto;
 
 import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.ScheduleEntity;
-import jdk.tools.jlink.internal.Archive;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
