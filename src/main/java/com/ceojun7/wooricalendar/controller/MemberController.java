@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -88,10 +89,25 @@ public class MemberController {
                     // .timezone()
                     .build();
             calendarService.create(calendar);
-
             ShareEntity shareEntity = ShareEntity.builder().calendarEntity(calendar)
                     .memberEntity(MemberEntity.builder().email(memberDTO.getEmail()).build()).checked(true).build();
             shareService.create(shareEntity);
+
+            if(memberDTO.getLanguage().substring(0,2).equals("ko")) {
+                CalendarEntity holidayCalendar = CalendarEntity.builder()
+                        .name("대한민국 공휴일")
+                        .regdate(new Date())
+                        .updatedate(new Date())
+                        // .timezone()
+                        .build();
+                calendarService.create(holidayCalendar);
+
+                ShareEntity holidayShareEntity = ShareEntity.builder().calendarEntity(holidayCalendar)
+                        .memberEntity(MemberEntity.builder().email(memberDTO.getEmail()).build()).checked(true).build();
+                shareService.create(holidayShareEntity);
+            }
+
+
 
             MemberDTO responseMemberDTO = memberDTO.builder()
                     .email(registeredMember.getEmail())
