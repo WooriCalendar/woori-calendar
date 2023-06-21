@@ -82,6 +82,7 @@ public class ShareService {
       ShareEntity original = originalList.get(0);
       original.setGrade(shareEntity.getGrade());
       original.setUpdateDate(new Date());
+      original.setChecked(shareEntity.isChecked());
 
       shareRepository.save(original);
     }

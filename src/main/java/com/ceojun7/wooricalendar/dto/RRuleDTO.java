@@ -28,7 +28,7 @@ import java.util.Date;
 @Data
 public class RRuleDTO {
     private String dtstart;
-    private Timestamp until;
+    private String until = null;
     private String freq;
 
     public RRuleDTO(final ScheduleEntity entity) {
@@ -39,7 +39,7 @@ public class RRuleDTO {
         } else {
             this.dtstart = String.valueOf(entity.getStartTime());
         }
-        this.until = entity.getReEndDate();
+        this.until = dtFormat.format(entity.getReEndDate());
         this.freq = entity.getRePeriod();
     }
 }

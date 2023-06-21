@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  *              2023.05.31 seolha86 create, retrieve 생성
  *              2023.06.01 강태수 update, delete, day 생성
  *              2023.06.08 seolha86 retrieve 수정 (calNo -> email)
+ *              2023.06.20 seolha86 retrieveScheduleByScNo 추가
  */
 @RestController
 @RequestMapping("schedule")
@@ -81,6 +82,14 @@ public class ScheduleController {
     @GetMapping
     public ResponseEntity<?> retrieveSchedule(@AuthenticationPrincipal String email) {
         List<ScheduleEntity> entities = service.retrieveByEmail(email);
+        List<ScheduleDTO> dtos = entities.stream().map(ScheduleDTO::new).collect(Collectors.toList());
+        ResponseDTO<ScheduleDTO> response = ResponseDTO.<ScheduleDTO>builder().data(dtos).build();
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/{scNo}")
+    public ResponseEntity<?> retrieveScheduleByScNo(@PathVariable Long scNo) {
+        List<ScheduleEntity> entities = service.retrieve(scNo);
         List<ScheduleDTO> dtos = entities.stream().map(ScheduleDTO::new).collect(Collectors.toList());
         ResponseDTO<ScheduleDTO> response = ResponseDTO.<ScheduleDTO>builder().data(dtos).build();
         return ResponseEntity.ok().body(response);

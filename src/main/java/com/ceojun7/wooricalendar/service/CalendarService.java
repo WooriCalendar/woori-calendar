@@ -68,6 +68,10 @@ public class CalendarService {
         return calendarList;
     }
 
+    public List<ShareEntity> retrieveByShareEntity_Email(String email) {
+        return shareRepository.findByMemberEntity_Email(email);
+    }
+
     /**
      * methodName : delete
      * comment : 캘린더 삭제
