@@ -13,4 +13,5 @@ public class InviteDTO {
   private String email;
   private Long calNo;
   private String name;
+  private Long grade;
 }
