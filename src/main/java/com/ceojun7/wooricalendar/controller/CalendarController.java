@@ -2,6 +2,7 @@ package com.ceojun7.wooricalendar.controller;
 
 import com.ceojun7.wooricalendar.dto.CalendarDTO;
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
+import com.ceojun7.wooricalendar.dto.ShareDTO;
 import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.MemberEntity;
 import com.ceojun7.wooricalendar.model.ShareEntity;
@@ -110,6 +111,14 @@ public class CalendarController {
         List<CalendarEntity> entities = service.retrieveByEmail(email);
         List<CalendarDTO> dtos = entities.stream().map(CalendarDTO::new).collect(Collectors.toList());
         ResponseDTO<CalendarDTO> response = ResponseDTO.<CalendarDTO>builder().data(dtos).build();
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/share")
+    public ResponseEntity<?> retrieveCalendarShared(@AuthenticationPrincipal String email) {
+        List<ShareEntity> entities = service.retrieveByShareEntity_Email(email);
+        List<ShareDTO> dtos = entities.stream().map(ShareDTO::new).collect(Collectors.toList());
+        ResponseDTO<ShareDTO> response = ResponseDTO.<ShareDTO>builder().data(dtos).build();
         return ResponseEntity.ok().body(response);
     }
 

@@ -5,13 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.dto.ShareDTO;
@@ -85,6 +79,14 @@ public class ShareController {
     List<ShareDTO> dtos = entities.stream().map(ShareDTO::new).collect(Collectors.toList());
     ResponseDTO<ShareDTO> response = ResponseDTO.<ShareDTO>builder().data(dtos).build();
     return ResponseEntity.ok().body(response);
+  }
+
+  @GetMapping("/{shareNo}")
+  public ResponseEntity<?> retrieveShare(@PathVariable Long shareNo) {
+      List<ShareEntity> entities = service.retrieve(shareNo);
+      List<ShareDTO> dtos = entities.stream().map(ShareDTO::new).collect(Collectors.toList());
+      ResponseDTO<ShareDTO> response = ResponseDTO.<ShareDTO>builder().data(dtos).build();
+      return ResponseEntity.ok().body(response);
   }
 
   /**
