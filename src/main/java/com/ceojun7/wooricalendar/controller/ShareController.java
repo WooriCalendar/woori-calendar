@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.dto.ShareDTO;
 import com.ceojun7.wooricalendar.model.ShareEntity;
+import com.ceojun7.wooricalendar.security.JwtAuthenticationFilter;
 import com.ceojun7.wooricalendar.service.ShareService;
 
 import lombok.extern.slf4j.Slf4j;

@@ -16,21 +16,20 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequest
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.web.filter.CorsFilter;
 
-
 /**
  * @author : DGeon
  * @packageName : com.ceojun7.wooricalendar.config
  * @fileName : WebSecurityConfig
  * @date : 2023-06-01
  * @description :
- * ===========================================================
- * DATE           AUTHOR             NOTE
- * -----------------------------------------------------------
- * 2023-06-01        DGeon             최초 생성
+ *              ===========================================================
+ *              DATE AUTHOR NOTE
+ *              -----------------------------------------------------------
+ *              2023-06-01 DGeon 최초 생성
  **/
 @EnableWebSecurity
 @SuppressWarnings("deprecation")
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -50,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and().csrf().disable().httpBasic().disable().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // session 안씀
                 .and().authorizeRequests()
-                .antMatchers("/", "/member/**", "/oauth2/**", "/auth/**","/sendmail/**").permitAll()
+                .antMatchers("/", "/member/**", "/oauth2/**", "/auth/**", "/sendmail/**", "/share").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
