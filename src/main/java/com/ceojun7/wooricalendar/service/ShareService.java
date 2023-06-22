@@ -64,6 +64,10 @@ public class ShareService {
     return shareRepository.findByShareNo(shareNo);
   }
 
+  public List<ShareEntity> retrieveByEmail(final String email) {
+    return shareRepository.findByMemberEntity_Email(email);
+  }
+
   /**
    * methodName : update
    * comment : 공유 권한 수정
@@ -104,6 +108,7 @@ public class ShareService {
    */
   public List<ShareEntity> delete(final ShareEntity shareEntity) {
     shareRepository.delete(shareEntity);
+    Long calNo = shareEntity.getCalendarEntity().getCalNo();
 
     return shareRepository.findByShareNo(shareEntity.getShareNo());
   }
