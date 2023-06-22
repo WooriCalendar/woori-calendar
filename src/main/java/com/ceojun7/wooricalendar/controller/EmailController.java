@@ -118,22 +118,25 @@ public class EmailController {
     public ResponseEntity<?> sendInviteMail(@RequestBody InviteDTO inviteDTO, @AuthenticationPrincipal String email)
             throws MessagingException {
 
-        log.warn("아이폰::::::::::" + String.valueOf(inviteDTO.getEmail()));
-        log.warn("아이폰::::::::::" + String.valueOf(email));
-        log.warn("아이폰::::::::::" + String.valueOf(inviteDTO.getCalNo()));
+        log.warn("테스트::::::::::" + String.valueOf(inviteDTO.getEmail()));
 
         EmailMessageEntity emailMessage = EmailMessageEntity.builder()
                 .to(inviteDTO.getEmail())
-                .subject(email + "님이 캘린더를 공유했습니다.")
+                .subject(email + "님이 " + "[ " + inviteDTO.getName() + " ] 캘린더를 공유했습니다.")
                 .build();
 
-        String code = emailService.sendMail(emailMessage, "invite");
+        Map<String, Object> data = emailService.sendInviteMail(emailMessage, "invite", inviteDTO, email);
 
-        EmailResponseDTO emailResponseDTO = new EmailResponseDTO();
+        // EmailResponseDTO emailResponseDTO = new EmailResponseDTO();
+        // emailResponseDTO.setCode(code);
+        log.warn("code:::::", data);
+        // log.warn(code);
+        log.warn("==================테스트==================");
+        log.warn(inviteDTO.getEmail());
+        log.warn(inviteDTO.getName());
+        log.warn("calNo:" + inviteDTO.getCalNo());
+        log.warn("grade:" + inviteDTO.getGrade());
 
-        emailResponseDTO.setCode(code);
-        log.warn(code);
-
-        return ResponseEntity.ok(emailResponseDTO);
+        return ResponseEntity.ok(data);
     }
 }
