@@ -64,6 +64,9 @@ public class ShareService {
     return shareRepository.findByShareNo(shareNo);
   }
 
+  public List<ShareEntity> retrieveByCalNo(final Long calNo){
+    return shareRepository.findByCalendarEntity_CalNo(calNo);
+  }
   /**
    * methodName : update
    * comment : 공유 권한 수정

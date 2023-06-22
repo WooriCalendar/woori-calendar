@@ -32,7 +32,6 @@ public interface CalendarRepository extends JpaRepository<CalendarEntity, String
      */
     List<CalendarEntity> findByCalNo(Long calNo);
 
-
     /**
      * methodName : findByName
      * comment : 캘린더 이름으로 캘린더 조회
