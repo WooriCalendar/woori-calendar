@@ -37,6 +37,7 @@ public class ShareDTO {
   private Long grade;
 
   private String calName;
+  private String color;
 
   // entity > dto
   public ShareDTO(final ShareEntity entity) {
@@ -48,6 +49,7 @@ public class ShareDTO {
     this.updateDate = entity.getUpdateDate();
     this.grade = entity.getGrade();
     this.calName = entity.getCalendarEntity().getName();
+    this.color = entity.getCalendarEntity().getColor();
   }
 
   // dto > entity
