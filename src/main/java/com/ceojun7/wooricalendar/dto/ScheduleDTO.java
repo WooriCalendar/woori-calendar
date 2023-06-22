@@ -51,7 +51,7 @@ public class ScheduleDTO {
 
     private boolean status;
 
-    private String dayOfWeek;
+     private String dayOfWeek;
 
 //    public ScheduleDTO(Long scNo, String title, String comment, String place, String start, String end, Date regDate, Date updateDate, Long calNo) {
 //        this.scNo = scNo;
@@ -73,23 +73,28 @@ public class ScheduleDTO {
 
         if (entity.getStartTime() == null && entity.getEndTime() == null) {
             SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd");
-            LocalDate date = LocalDate.of(entity.getStartDate().getYear(), entity.getStartDate().getMonth(), entity.getStartDate().getDate() -2);
-            DayOfWeek day = date.getDayOfWeek();
 
             this.start = dtFormat.format(entity.getStartDate());
             this.end = dtFormat.format(entity.getEndDate());
-            this.dayOfWeek = day.getDisplayName(TextStyle.SHORT, Locale.US);
+
+            if (entity.getCalendarEntity().getCalNo() != 90 && entity.getCalendarEntity().getCalNo() != 98) {
+                LocalDate date = LocalDate.of(entity.getStartDate().getYear(), entity.getStartDate().getMonth(), entity.getStartDate().getDate() -2);
+                DayOfWeek day = date.getDayOfWeek();
+
+                this.dayOfWeek = day.getDisplayName(TextStyle.SHORT, Locale.US);
+            }
         } else {
             LocalDate date = LocalDate.of(entity.getStartTime().getYear(), entity.getStartTime().getMonth(), entity.getStartTime().getDate() -2);
             DayOfWeek day = date.getDayOfWeek();
 
             this.start = String.valueOf(entity.getStartTime());
             this.end = String.valueOf(entity.getEndTime());
-            this.dayOfWeek = day.getDisplayName(TextStyle.SHORT, Locale.US);
+
+            if (entity.getCalendarEntity().getCalNo() != 90 && entity.getCalendarEntity().getCalNo() != 98) {
+                this.dayOfWeek = day.getDisplayName(TextStyle.SHORT, Locale.US);
+            }
         }
 
-//        this.regDate = entity.getRegDate();
-//        this.updateDate = entity.getRegDate();
         this.calNo = entity.getCalendarEntity().getCalNo();
         this.color = entity.getCalendarEntity().getColor();
 
