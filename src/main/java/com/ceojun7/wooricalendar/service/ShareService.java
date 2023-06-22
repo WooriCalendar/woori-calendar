@@ -64,8 +64,13 @@ public class ShareService {
     return shareRepository.findByShareNo(shareNo);
   }
 
+
   public List<ShareEntity> retrieveByEmail(final String email) {
     return shareRepository.findByMemberEntity_Email(email);
+  }
+
+  public List<ShareEntity> retrieveByCalNo(final Long calNo){
+    return shareRepository.findByCalendarEntity_CalNo(calNo);
   }
 
   /**

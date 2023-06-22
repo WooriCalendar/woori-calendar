@@ -28,6 +28,8 @@ public interface ShareRepository extends JpaRepository<ShareEntity, Long> {
 
     List<ShareEntity> findByMemberEntity_EmailAndChecked(String email, boolean checked);
 
+    List<ShareEntity> findByCalendarEntity_CalNo(Long calNo);
+
     // 사용자 본인이 가지고 있는 캘린더만 조회
     @Query("SELECT s FROM ShareEntity s WHERE s.memberEntity.email = :email AND s.calendarEntity.calNo = :calNo")
     List<ShareEntity> findByMemberEntity_EmailAndCalNo(String email, Long calNo);
