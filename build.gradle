@@ -51,6 +51,7 @@ dependencies {
     implementation 'org.json:json:20230227'
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation 'commons-io:commons-io:2.11.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.0'
 
     //xml to json 관련
 
