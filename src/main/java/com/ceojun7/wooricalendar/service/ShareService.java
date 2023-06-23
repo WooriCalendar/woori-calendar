@@ -137,10 +137,10 @@ public class ShareService {
       if (scheduleEntities.size() > 0) { // 일정이 하나 이상 존재하면
         for (int i = 0; i < scheduleEntities.size(); i++) { // 모든 일정 탐색
           scheduleRepository.delete(scheduleEntities.get(i)); // 모든 일정 삭제
-          shareRepository.delete(shareEntity); // 구독 취소
         }
-        calendarService.delete(calendarRepository.findByCalNo(calNo).get(0)); // 캘린더 삭제
       }
+      shareRepository.delete(shareEntity); // 구독 취소
+      calendarService.delete(calendarRepository.findByCalNo(calNo).get(0)); // 캘린더 삭제
     }
     shareRepository.delete(shareEntity); // 구독자가 여러명일 경우 구독취소만 됨
 

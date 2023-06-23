@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.dto.ShareDTO;
+import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.ShareEntity;
 import com.ceojun7.wooricalendar.persistence.ShareRepository;
 import com.ceojun7.wooricalendar.service.ShareService;
@@ -128,10 +129,14 @@ public class ShareController {
    * @return the response entity
    */
   @DeleteMapping
-  public ResponseEntity<?> deleteShare(@RequestBody ShareDTO dto) {
-    log.warn(String.valueOf(dto));
+  public ResponseEntity<?> deleteShare(@RequestBody Long shareNo) {
+    log.warn("===========넘어옴====" + shareNo);
     try {
-      ShareEntity entity = ShareDTO.toEntity(dto);
+
+      ShareEntity entity = ShareEntity.builder()
+          .shareNo(shareNo)
+          .build();// 쉐어 넘버만 있는 엔티티 나머지 null
+
       List<ShareEntity> entities = service.delete(entity);
       List<ShareDTO> dtos = entities.stream().map(ShareDTO::new).collect(Collectors.toList());
       ResponseDTO<ShareDTO> response = ResponseDTO.<ShareDTO>builder().data(dtos).build();
