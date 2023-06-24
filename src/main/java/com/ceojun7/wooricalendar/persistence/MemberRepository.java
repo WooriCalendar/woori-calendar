@@ -53,4 +53,16 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
      */
     MemberEntity findByEmailAndPassword(String email, String password);
 
+    /**
+     * methodName : findBySubEmail
+     * comment : submemail로 본 email 찾기
+     * author : DGeon
+     * date : 2023-06-23
+     * description :
+     *
+     * @param subemail the subemail
+     * @return member entity
+     */
+    MemberEntity findBySubemail(String subemail);
+
 }
