@@ -5,8 +5,10 @@ import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.dto.ShareDTO;
 import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.MemberEntity;
+import com.ceojun7.wooricalendar.model.ScheduleEntity;
 import com.ceojun7.wooricalendar.model.ShareEntity;
 import com.ceojun7.wooricalendar.service.CalendarService;
+import com.ceojun7.wooricalendar.service.ScheduleService;
 import com.ceojun7.wooricalendar.service.ShareService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,9 @@ import java.net.URL;
 public class CalendarController {
     @Autowired
     private CalendarService service;
+
+    @Autowired
+    private ScheduleService scheduleService;
 
     @Autowired
     private ShareService shareService;
@@ -149,20 +154,34 @@ public class CalendarController {
      * comment : 캘린더 삭제
      * author : 강태수
      * date : 2023-06-01
-     * description :
+     * description : 일정 조회 후 존재시 삭제, 쉐어 조회 후 존재 시 삭제
      *
      * @param dto
      * @return the response entity
      * 
      */
-
     @DeleteMapping
-    public ResponseEntity<?> deleteCalendar(@RequestBody CalendarDTO dto) {
-
+    public ResponseEntity<?> deleteCalendar(@RequestBody Long calNo) {
         try {
-            CalendarEntity entity = CalendarDTO.toEntity(dto);
 
-            List<CalendarEntity> entities = service.delete(entity);
+            CalendarEntity calendarEntity = service.retrieve(calNo).get(0); //캘린더 번호를 통하여 캘린더 엔티티 조회
+            // 스케쥴 조회 및 삭제
+            List<ScheduleEntity> scheduleEntityList = scheduleService.retrieveByCalNo(calNo); //캘린더 번호를 통하여 일정 조회
+            if (scheduleEntityList.size() > 0){ // 일정이 존재할 때
+                for(int i = 0; i < scheduleEntityList.size(); i++){
+                    scheduleService.delete(scheduleEntityList.get(i)); // 모든 일정 삭제
+                }
+            }
+            // 쉐어 조회 및 삭제
+            List<ShareEntity> shareEntityList = shareService.retrieveByCalNo(calNo); // 캘린더 번호를 통한 공유 조회
+            if (shareEntityList.size() > 0){ // 구독자가 존재할 경우
+                for(int i = 0; i < shareEntityList.size(); i++) {
+                    shareService.delete(shareEntityList.get(i)); // 모든 공유 삭제
+                }
+            }
+
+            // 일정과 공유를 삭제했으니, 이제 캘린더 삭제
+            List<CalendarEntity> entities = service.delete(calendarEntity);
             List<CalendarDTO> dtos = entities.stream().map(CalendarDTO::new).collect(Collectors.toList());
             ResponseDTO<CalendarDTO> response = ResponseDTO.<CalendarDTO>builder().data(dtos).build();
             return ResponseEntity.ok().body(response);

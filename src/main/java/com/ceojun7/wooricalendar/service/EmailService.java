@@ -110,7 +110,9 @@ public class EmailService {
         data.put("receiver", inviteDTO.getEmail());
         data.put("sender", email);
         log.info("과연 토큰을 가져왔을까요?" + token);
+        data.put("calNo", inviteDTO.getCalNo());
         data.put("token", token);
+        data.put("grade", inviteDTO.getGrade());
         String gradeSet = "";
         if (inviteDTO.getGrade() == 0) {
             gradeSet = "보기";
@@ -119,7 +121,7 @@ public class EmailService {
         } else if (inviteDTO.getGrade() == 2) {
             gradeSet = "관리";
         }
-        data.put("grade", gradeSet);
+        data.put("gradeString", gradeSet);
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {

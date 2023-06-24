@@ -79,7 +79,6 @@ public class ScheduleService {
      * @return the list
      * 
      */
-
     public List<ScheduleEntity> update(final ScheduleEntity entity) {
         final List<ScheduleEntity> originalList = scheduleRepository
                 .findByCalendarEntity_CalNo(entity.getCalendarEntity().getCalNo());
@@ -106,7 +105,6 @@ public class ScheduleService {
      * @return scheduleRepository
      * 
      */
-
     public List<ScheduleEntity> delete(final ScheduleEntity entity) {
         scheduleRepository.delete(entity);
         CalendarEntity calendarEntity = calendarRepository.findByCalNo(entity.getCalendarEntity().getCalNo()).get(0);
@@ -123,5 +121,9 @@ public class ScheduleService {
         }
 
         return scheduleList;
+    }
+
+    public List<ScheduleEntity> retrieveByCalNo(Long calNo){
+        return scheduleRepository.findByCalendarEntity_CalNo(calNo);
     }
 }
