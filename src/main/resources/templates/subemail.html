@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<hr style="border : 2px solid rgb(3, 199, 90)">
+<br>
+<br>
+<div style="justify-content: center;">
+    <div style="margin:100px; display: flex; justify-content: space-between;">
+        <main style="width: 48%">
+            <div style="width: max-content;">
+                <div>Woori Calendar</div>
+                <h1><span style="color: rgb(3, 199, 90)">이메일</span>안내 입니다.</h1>
+                <br>
+                <br>
+                <p>안녕하세요<br>
+                    우리캘린더를 이용해 주셔서 진심으로 감사드립니다.<br>
+                    아래는 요청 주신
+                    <b>이메일 계정</b>
+                    입니다 <br>
+                    감사합니다<br>
+                </p>
+                <br>
+                <br>
+            </div>
+        </main>
+        <aside style="width: 48%">
+            <di style="width: max-content;">
+                <img src="cid:logo" style="width: 300px">
+            </di>
+        </aside>
+    </div>
+</div>
+<hr>
+<div align="center">
+    <h3 style="color:rgb(3, 199, 90)"> 아래는 회원가입 하신 이메일 입니다. </h3>
+    <div style="font-size:130%" th:text="${code}"></div>
+</div>
+<br/>
+<hr style="border : 2px solid rgb(3, 199, 90)">
+<div align="center">
+    <span>Copyright &copy; Woori Calendar</span>
+</div>
+</body>
+</html>
