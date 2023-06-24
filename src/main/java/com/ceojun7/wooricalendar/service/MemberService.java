@@ -135,20 +135,21 @@ public class MemberService {
      */
     public List<String> findeamil() {
         List<MemberEntity> entityList = memberRepository.findAll();
-        log.warn("{}",entityList);
+        log.warn("{}", entityList);
         return entityList.stream()
                 .map(MemberEntity::getEmail)
                 .collect(Collectors.toList());
     }
 
-//    public String findByEmail(MemberDTO memberDTO){
-//        MemberEntity memberEntity = memberRepository.findByEmail(memberDTO.getEmail());
-//        return memberEntity.getEmail();
-//    }
+    // public String findByEmail(MemberDTO memberDTO){
+    // MemberEntity memberEntity =
+    // memberRepository.findByEmail(memberDTO.getEmail());
+    // return memberEntity.getEmail();
+    // }
 
-    public MemberEntity findByEmail(String email){
+    public MemberEntity findByEmail(String email) {
         MemberEntity memberEntity = memberRepository.findByEmail(email);
-        log.warn("서비스{}",memberEntity.getEmail());
+        log.warn("서비스{}", memberEntity.getEmail());
         return memberEntity;
     }
 
@@ -160,5 +161,24 @@ public class MemberService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * methodName : deleteMember
+     * comment : 회원탈퇴
+     * author : 강태수
+     * date : 2023-06-24
+     * description :
+     *
+     * @param MemberEntity
+     * @return
+     * 
+     */
+
+    public void deleteMember(final MemberEntity entity) {
+        MemberEntity managedEntity = memberRepository.findByEmail(entity.getEmail());
+        if (managedEntity != null) {
+            memberRepository.delete(managedEntity);
+        }
     }
 }
