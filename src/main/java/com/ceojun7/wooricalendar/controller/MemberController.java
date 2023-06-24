@@ -101,17 +101,20 @@ public class MemberController {
             shareService.create(shareEntity);
 
             if(memberDTO.getLanguage().substring(0,2).equals("ko")) {
-                CalendarEntity holidayCalendar = CalendarEntity.builder()
-                        .name("대한민국 공휴일")
-                        .regdate(new Date())
-                        .updatedate(new Date())
-                        // .timezone()
-                        .build();
-                calendarService.create(holidayCalendar);
-
-                ShareEntity holidayShareEntity = ShareEntity.builder().calendarEntity(holidayCalendar)
+//                CalendarEntity holidayCalendar = CalendarEntity.builder()
+//                        .name("대한민국 공휴일")
+//                        .regdate(new Date())
+//                        .updatedate(new Date())
+//                        // .timezone()
+//                        .build();
+//                calendarService.create(holidayCalendar);
+                ShareEntity koreaCalendar = null;
+                koreaCalendar = ShareEntity.builder().calendarEntity(CalendarEntity.builder().calNo(90L).build())
                         .memberEntity(MemberEntity.builder().email(memberDTO.getEmail()).build()).checked(true).build();
-                shareService.create(holidayShareEntity);
+                shareService.create(koreaCalendar);
+                koreaCalendar = ShareEntity.builder().calendarEntity(CalendarEntity.builder().calNo(98L).build())
+                        .memberEntity(MemberEntity.builder().email(memberDTO.getEmail()).build()).checked(true).build();
+                shareService.create(koreaCalendar);
             }
 
 
