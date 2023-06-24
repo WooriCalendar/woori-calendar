@@ -139,4 +139,34 @@ public class EmailController {
 
         return ResponseEntity.ok(data);
     }
+
+
+
+    /**
+     * methodName : sendJoinMail
+     * comment : 이메일 찾기를 위한 PostMapping(보조 이메일을 입력하면 본 이메일을 HTML에 보낸다)
+     * author : DGeon
+     * date : 2023-06-24
+     * description :
+     *
+     * @param emailPostDto the email post dto
+     * @return response entity
+     * @throws MessagingException the messaging exception
+     */
+    @PostMapping("/subemail")
+    public ResponseEntity<?> sendForgotEmail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
+        log.warn(String.valueOf(emailPostDto));
+
+        EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                .to(emailPostDto.getEmail())
+                .subject("[Woori] 이메일 찾기 입니다")
+                .build();
+
+        String code = emailService.sendMail(emailMessage, "subemail");
+
+        EmailResponseDTO emailResponseDto = new EmailResponseDTO();
+        emailResponseDto.setCode(code);
+        log.warn(code);
+        return ResponseEntity.ok(emailResponseDto);
+    }
 }

@@ -1,25 +1,38 @@
 package com.ceojun7.wooricalendar.controller;
 
-import com.ceojun7.wooricalendar.dto.CalendarDTO;
-import com.ceojun7.wooricalendar.dto.MemberDTO;
-import com.ceojun7.wooricalendar.dto.ResponseDTO;
-import com.ceojun7.wooricalendar.model.CalendarEntity;
-import com.ceojun7.wooricalendar.model.MemberEntity;
-import com.ceojun7.wooricalendar.model.ShareEntity;
+import com.ceojun7.wooricalendar.dto.*;
+import com.ceojun7.wooricalendar.model.*;
 import com.ceojun7.wooricalendar.security.TokenProvider;
-import com.ceojun7.wooricalendar.service.CalendarService;
-import com.ceojun7.wooricalendar.service.MemberService;
-import com.ceojun7.wooricalendar.service.ShareService;
+import com.ceojun7.wooricalendar.service.*;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : DGeon
@@ -36,21 +49,15 @@ import java.util.Date;
 @RestController
 @RequestMapping("member")
 @Slf4j
+@RequiredArgsConstructor
 public class MemberController {
-    @Autowired
-    private MemberService memberService;
-
-    @Autowired
-    private TokenProvider tokenProvider;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private CalendarService calendarService;
-
-    @Autowired
-    private ShareService shareService;
+    private final MemberService memberService;
+    private final TokenProvider tokenProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final CalendarService calendarService;
+    private final ShareService shareService;
+    private final ScheduleService scheduleService;
+    private final EmailService emailService;
 
     /**
      * methodName : registerMember
@@ -163,7 +170,7 @@ public class MemberController {
      * date : 2023-06-20
      * description :
      *
-     * @param MemberEntity
+     * @param memberDTO
      * @return the ResponseEntity
      * 
      */
@@ -242,24 +249,94 @@ public class MemberController {
      * @return response entity
      */
     @PostMapping("findemail")
-    public ResponseEntity<?> getEmail(@RequestBody MemberDTO memberDTO) {
+    public ResponseEntity<?> getEmail(@RequestBody MemberDTO memberDTO) throws MessagingException {
 
         // log.warn(memberDTO.getEmail());
         // String findemail = memberService.findByEmail(memberDTO.getEmail());
         // log.warn(findemail);
         try {
-            log.warn("email 중복검사 :: get호출됨 :: " + memberDTO.getEmail());
-            MemberEntity member = memberService.findByEmail(memberDTO.getEmail());
-            MemberDTO responseMemberDTO = memberDTO.builder()
-                    .email(member.getEmail())
-                    .build();
+            MemberEntity member = null;
+            MemberDTO responseMemberDTO = null;
+                if(memberDTO.getEmail() != null) {
+                    log.warn("email 중복검사 :: get호출됨 :: " + memberDTO.getEmail());
+                    member = memberService.findByEmail(memberDTO.getEmail());
+                    responseMemberDTO = memberDTO.builder()
+                            .email(member.getEmail())
+                            .build();
+                }else if(memberDTO.getSubemail() != null){
+                    log.warn("subemail 호출::"+memberDTO.getSubemail());
+                    if(memberService.findBySubEmail(memberDTO.getSubemail()) !=null){
+                    member = memberService.findBySubEmail(memberDTO.getSubemail());
+
+                    EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                            .to(member.getSubemail())
+                            .subject("[Woori] 이메일 찾기 입니다")
+                            .build();
+
+                    emailService.sendsubEmail(emailMessage, "subemail", member.getEmail());
+
+//                    EmailResponseDTO emailResponseDto = new EmailResponseDTO();
+//                    emailResponseDto.setCode(code);
+//                    log.warn(code);
+//
+
+//                    return ResponseEntity.ok(emailResponseDto);
+                        responseMemberDTO = memberDTO.builder()
+                                .email(member.getEmail())
+                                .subemail(member.getSubemail())
+                                .build();
+
+                    }else {
+                        responseMemberDTO = memberDTO.builder()
+                                .email(member.getEmail())
+                                .subemail(member.getSubemail())
+                                .build();
+                    }
+                }
             return ResponseEntity.ok().body(responseMemberDTO);
         } catch (NullPointerException nullPointerException) {
+            log.warn("nullPoint");
             MemberDTO reMemberDTO = memberDTO.builder().build();
             return ResponseEntity.ok().body(reMemberDTO);
         }
     }
 
+    /**
+     * Gets sub email.
+     * comment : subemail을 찾기 위한 PostMapping  메서드
+     * author : DGeon
+     * date : 2023-06-23
+     * description :
+     *
+     * @param memberDTO the member dto
+     * @return the sub email
+     */
+//    @PostMapping("findsubemail")
+//    public ResponseEntity<?> getSubEmail(@RequestBody MemberDTO memberDTO) {
+//
+//        try {
+//            MemberEntity member = memberService.findBySubEmail(memberDTO.getSubemail());
+//            MemberDTO responseMemberDTO = memberDTO.builder()
+//                    .email(member.getEmail())
+//                    .build();
+//            return ResponseEntity.ok().body(responseMemberDTO);
+//
+//        } catch (NullPointerException nullPointerException) {
+//            MemberDTO reMemberDTO = memberDTO.builder().build();
+//            return ResponseEntity.ok().body(reMemberDTO);
+//        }
+//    }
+
+    /**
+     * methodName : updatePassword
+     * comment : 비밀번호 변경(forgotpassword)
+     * author : DGeon
+     * date : 2023-06-17
+     * description :
+     *
+     * @param memberDTO the member dto
+     * @return response entity
+     */
     @PutMapping("updatePassword")
     public ResponseEntity<String> updatePassword(@RequestBody MemberDTO memberDTO) {
 
@@ -270,4 +347,102 @@ public class MemberController {
         }
         return new ResponseEntity<>("회원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
     }
+
+
+    /**
+     * methodName : cal
+     * comment : 대한민국 대체공휴일 및 국경일 불러오는 GetMapping 메서드 (1년에 1번 정도 실행하면 된다)
+     * author : DGeon
+     * date : 2023-06-23
+     * description :
+     *
+     * @param scheduleDTO the schedule dto
+     * @param email       the email
+     * @throws IOException    the io exception
+     * @throws ParseException the parse exception
+     */
+    @GetMapping("cal")
+    public void cal(ScheduleDTO scheduleDTO, String email) throws IOException, ParseException {
+        String AnniversaryInfo = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getAnniversaryInfo";
+        String HoliDeInfo = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getHoliDeInfo";
+        StringBuilder urlBuilder = new StringBuilder(HoliDeInfo); /*URL*/
+        urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=4chyTuzqZyZy3L0j6TzepfD0SEeHJM5J7yGtEX%2F8HQeD4fZofd%2B%2FseXdgoveey8ibGuH9KHKmqTkZc3ztsbvVQ%3D%3D"); /*Service Key*/
+        urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("100", "UTF-8")); /*한 페이지 결과 수*/
+        urlBuilder.append("&" + URLEncoder.encode("solYear", "UTF-8") + "=" + URLEncoder.encode("2024", "UTF-8")); /*연*/
+//        urlBuilder.append("&" + URLEncoder.encode("solMonth", "UTF-8") + "=" + URLEncoder.encode("06", "UTF-8")); /*월*/
+        URL url = new URL(urlBuilder.toString());
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Content-type", "application/json");
+        System.out.println("Response code: " + conn.getResponseCode());
+        BufferedReader rd;
+        if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
+            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+        } else {
+            rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+        }
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = rd.readLine()) != null) {
+            sb.append(line);
+        }
+        rd.close();
+        conn.disconnect();
+
+        String xml = sb.toString();
+        JSONObject jsonObject = convertXmlToJson(xml);
+        JSONArray itemArray = jsonObject.getJSONObject("response")
+                .getJSONObject("body")
+                .getJSONObject("items")
+                .getJSONArray("item");
+
+        SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (int i = 0; i < itemArray.length(); i++) {
+            JSONObject itemObject = itemArray.getJSONObject(i);
+            String dateName = itemObject.getString("dateName");
+            String dateFull = String.valueOf(itemObject.getInt("locdate"));
+            String year = dateFull.substring(0,4);
+            String month = dateFull.substring(4,6);
+            String day = dateFull.substring(6,8);
+            String date = year+"-"+month+"-"+day;
+
+//            Date dd = Date.parse(date);
+            ScheduleEntity entity = ScheduleEntity .builder()
+                    .name(dateName)
+                    .startDate(Timestamp.valueOf(date + " 00:00:00"))
+                    .endDate(Timestamp.valueOf(date + " 00:00:00"))
+                    .calendarEntity(CalendarEntity.builder().calNo(98L).build())
+                    .build();
+            scheduleService.create(entity);
+
+        }
+    }
+
+
+    private JSONObject convertXmlToJson(String xml) {
+        try {
+            JSONObject jsonObject = XML.toJSONObject(xml);
+            return jsonObject;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+//    public static void xmlToJson(String str) {
+//
+//        try{
+//            JSONObject jObject = XML.toJSONObject(str);
+//            ObjectMapper mapper = new ObjectMapper();
+//            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+//            Object json = mapper.readValue(jObject.toString(), Object.class);
+//            String output = mapper.writeValueAsString(json);
+//            System.out.println(output);
+//        }catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

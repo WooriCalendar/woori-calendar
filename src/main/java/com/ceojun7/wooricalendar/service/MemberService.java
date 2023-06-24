@@ -146,12 +146,34 @@ public class MemberService {
 //        return memberEntity.getEmail();
 //    }
 
+    /**
+     * methodName : findByEmail
+     * comment : 이메일 중복 확인
+     * author : DGeon
+     * date : 2023-06-16
+     * description :
+     *
+     * @param email the email
+     * @return member entity
+     */
     public MemberEntity findByEmail(String email){
+
         MemberEntity memberEntity = memberRepository.findByEmail(email);
         log.warn("서비스{}",memberEntity.getEmail());
         return memberEntity;
     }
 
+    /**
+     * methodName : updatePassword
+     * comment : 비밀번호 변경(forgotpassword)
+     * author : DGeon
+     * date : 2023-06-17
+     * description :
+     *
+     * @param email    the email
+     * @param password the password
+     * @return boolean
+     */
     public boolean updatePassword(String email, String password) {
         MemberEntity memberEntity = memberRepository.findByEmail(email);
         if (memberEntity != null) {
@@ -160,5 +182,13 @@ public class MemberService {
             return true;
         }
         return false;
+    }
+
+    public MemberEntity findBySubEmail(String email){
+
+        MemberEntity memberEntity = memberRepository.findBySubemail(email);
+        log.warn("서비스 subemail{}",memberEntity.getEmail());
+        log.warn("서비스는 왔는데" + memberEntity);
+        return memberEntity;
     }
 }
