@@ -39,8 +39,11 @@ public class MemberDTO {
         if(memberEntity.getPassword() != null) {
             this.email = memberEntity.getEmail();
             this.password = memberEntity.getPassword();
-        }else{
+        }else if(memberEntity.getSubemail() != null && memberEntity.getEmail() !=null){
+            this.subemail = memberEntity.getSubemail();
             this.email = memberEntity.getEmail();
+        }else if(memberEntity.getSubemail() != null){
+            this.subemail = memberEntity.getSubemail();
         }
     }
 
