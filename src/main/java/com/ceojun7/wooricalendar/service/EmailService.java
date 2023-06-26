@@ -142,4 +142,27 @@ public class EmailService {
             throw new RuntimeException(e);
         }
     }
+
+    public String sendsubEmail(EmailMessageEntity emailMessage, String type, String email) throws MessagingException {
+        String authNum = email;
+
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            mimeMessageHelper.setTo(emailMessage.getTo()); // 메일 수신자
+            mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
+            mimeMessageHelper.setText(setContext(authNum, type), true); // 메일 본문 내용, HTML 여부
+            ClassPathResource imgRs = new ClassPathResource("images/emailLogo.jpg");
+            mimeMessageHelper.addInline("logo", imgRs);
+            javaMailSender.send(mimeMessage);
+
+            log.info("Success");
+
+            return authNum;
+
+        } catch (MessagingException e) {
+            log.info("fail");
+            throw new RuntimeException(e);
+        }
+    }
 }
