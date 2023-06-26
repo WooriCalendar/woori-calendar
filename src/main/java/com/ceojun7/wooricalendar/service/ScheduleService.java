@@ -86,6 +86,10 @@ public class ScheduleService {
             ScheduleEntity original = originalList.get(0);
             original.setComment(entity.getComment());
             original.setName(entity.getName());
+            original.setStartDate(entity.getStartDate());
+            original.setEndDate(entity.getEndDate());
+            original.setPlace(entity.getPlace());
+            original.setRePeriod(entity.getRePeriod());
 
             scheduleRepository.save(original);
         }
@@ -123,7 +127,7 @@ public class ScheduleService {
         return scheduleList;
     }
 
-    public List<ScheduleEntity> retrieveByCalNo(Long calNo){
+    public List<ScheduleEntity> retrieveByCalNo(Long calNo) {
         return scheduleRepository.findByCalendarEntity_CalNo(calNo);
     }
 }

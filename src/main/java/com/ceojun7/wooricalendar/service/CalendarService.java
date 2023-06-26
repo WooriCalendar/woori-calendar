@@ -112,6 +112,7 @@ public class CalendarService {
             original.setComment(entity.getComment());
             original.setName(entity.getName());
             original.setTimezone(entity.getTimezone());
+            original.setColor(entity.getColor());
 
             calendarRepository.save(original);
         }

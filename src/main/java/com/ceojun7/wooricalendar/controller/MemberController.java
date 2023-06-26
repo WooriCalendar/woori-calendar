@@ -5,10 +5,14 @@ import com.ceojun7.wooricalendar.dto.MemberDTO;
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.MemberEntity;
+import com.ceojun7.wooricalendar.model.NotificationEntity;
+import com.ceojun7.wooricalendar.model.ScheduleEntity;
 import com.ceojun7.wooricalendar.model.ShareEntity;
 import com.ceojun7.wooricalendar.security.TokenProvider;
 import com.ceojun7.wooricalendar.service.CalendarService;
 import com.ceojun7.wooricalendar.service.MemberService;
+import com.ceojun7.wooricalendar.service.NotificationService;
+import com.ceojun7.wooricalendar.service.ScheduleService;
 import com.ceojun7.wooricalendar.service.ShareService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author : DGeon
@@ -51,6 +56,12 @@ public class MemberController {
 
     @Autowired
     private ShareService shareService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private ScheduleService scheduleService;
 
     /**
      * methodName : registerMember
@@ -93,7 +104,7 @@ public class MemberController {
                     .memberEntity(MemberEntity.builder().email(memberDTO.getEmail()).build()).checked(true).build();
             shareService.create(shareEntity);
 
-            if(memberDTO.getLanguage().substring(0,2).equals("ko")) {
+            if (memberDTO.getLanguage().substring(0, 2).equals("ko")) {
                 CalendarEntity holidayCalendar = CalendarEntity.builder()
                         .name("대한민국 공휴일")
                         .regdate(new Date())
@@ -106,8 +117,6 @@ public class MemberController {
                         .memberEntity(MemberEntity.builder().email(memberDTO.getEmail()).build()).checked(true).build();
                 shareService.create(holidayShareEntity);
             }
-
-
 
             MemberDTO responseMemberDTO = memberDTO.builder()
                     .email(registeredMember.getEmail())
@@ -269,5 +278,45 @@ public class MemberController {
             return new ResponseEntity<>("회원 정보가 성공적으로 업데이트되었습니다.", HttpStatus.OK);
         }
         return new ResponseEntity<>("회원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteMember(@AuthenticationPrincipal String email) {
+        List<ScheduleEntity> scheduleEntityList = scheduleService.retrieveByEmail(email); // 캘린더 번호를 통하여 일정 조회
+
+        // 일정 삭제
+        for (ScheduleEntity scheduleEntity : scheduleEntityList) {
+            scheduleService.delete(scheduleEntity);
+        }
+
+        // 공유된 일정 삭제 및 캘린더 삭제
+        List<ShareEntity> shareEntityList = shareService.retrieveByEmail(email);
+        if (shareEntityList.size() == 1) {
+            // 공유된 일정이 한 명에게만 공유되었을 경우 캘린더 삭제
+            ShareEntity shareEntity = shareEntityList.get(0);
+            shareService.delete(shareEntity); // 공유 삭제
+            CalendarEntity calendarEntity = shareEntity.getCalendarEntity();
+            calendarService.delete(calendarEntity); // 캘린더 삭제
+        } else {
+            // 공유된 일정이 여러 명에게 공유되었을 경우에는 공유만 삭제
+            for (ShareEntity shareEntity : shareEntityList) {
+                shareService.delete(shareEntity); // 공유 삭제
+            }
+        }
+
+        // 알림 삭제
+        List<NotificationEntity> notificationEntities = notificationService.retrieve(email);
+        for (NotificationEntity notificationEntity : notificationEntities) {
+            notificationService.delete(notificationEntity);
+        }
+
+        // 멤버 삭제
+        MemberEntity memberEntity = memberService.findByEmail(email);
+        if (memberEntity != null) {
+            memberService.deleteMember(memberEntity);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
