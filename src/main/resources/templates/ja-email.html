@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<hr style="border : 2px solid rgb(3, 199, 90)">
+<br>
+<br>
+<div style="justify-content: center;">
+    <div style="margin:100px; display: flex; justify-content: space-between;">
+        <main style="width: 48%">
+            <div style="width: max-content;">
+                <div>Woori Calendar</div>
+                <h1> <span style="color: rgb(3, 199, 90)">メール認証</span>ガイドです。</h1>
+                <br>
+                <br>
+                <p>こんにちは<br>
+                    私たちのカレンダーをご利用いただきありがとうございます。<br>
+                    下
+                    <b>認証コード</b>
+                    を入力して会員登録を完了してください。<br>
+                    ありがとう<br>
+                </p>
+                <br>
+                <p>下記のコードを会員登録ウィンドウに戻って入力してください。</p>
+                <br>
+            </div>
+        </main>
+        <aside style="width: 48%">
+            <di style="width: max-content;">
+                <img src="cid:logo" style="width: 300px">
+            </di>
+        </aside>
+    </div>
+</div>
+<hr>
+<div align="center">
+    <h3 style="color:rgb(3, 199, 90)"> 会員登録認証コードです。 </h3>
+    <div style="font-size:130%" th:text="${code}">asv342fe</div>
+</div>
+<br/>
+<hr style="border : 2px solid rgb(3, 199, 90)">
+<div align="center">
+    <span>Copyright＆copy; Woori Calendar</span>
+</div>
+</body>
+</html>
