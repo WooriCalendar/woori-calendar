@@ -1,6 +1,8 @@
 package com.ceojun7.wooricalendar.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.MemberEntity;
@@ -39,6 +41,8 @@ public class ShareDTO {
   private String calName;
   private String color;
 
+  private List<ScheduleDTO> schedule = new ArrayList<>();
+
   // entity > dto
   public ShareDTO(final ShareEntity entity) {
     this.shareNo = entity.getShareNo();
@@ -50,6 +54,10 @@ public class ShareDTO {
     this.grade = entity.getGrade();
     this.calName = entity.getCalendarEntity().getName();
     this.color = entity.getCalendarEntity().getColor();
+
+    for (int i = 0; i < entity.getCalendarEntity().getSchedules().size(); i++) {
+        this.schedule.add(new ScheduleDTO(entity.getCalendarEntity().getSchedules().get(i)));
+    }
   }
 
   // dto > entity

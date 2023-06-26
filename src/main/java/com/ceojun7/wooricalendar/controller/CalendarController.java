@@ -23,6 +23,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,6 +84,12 @@ public class CalendarController {
         log.warn(String.valueOf(dto));
         try {
             CalendarEntity entity = CalendarDTO.toEntity(dto);
+
+            if (dto.getColor().trim().length() == 0) {
+                Random r = new Random();
+                entity.setColor(String.format("#%06x", r.nextInt(0xffffff + 1)));
+            }
+
             List<CalendarEntity> entities = service.create(entity);
             List<CalendarDTO> dtos = entities.stream().map(CalendarDTO::new).collect(Collectors.toList());
             ResponseDTO<CalendarDTO> response = ResponseDTO.<CalendarDTO>builder().data(dtos).build();
