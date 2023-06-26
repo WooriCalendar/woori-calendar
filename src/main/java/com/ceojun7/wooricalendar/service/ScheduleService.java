@@ -8,12 +8,14 @@ import com.ceojun7.wooricalendar.persistence.ScheduleRepository;
 import com.ceojun7.wooricalendar.persistence.ShareRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @packageName : com.ceojun7.wooricalendar.service
@@ -40,6 +42,9 @@ public class ScheduleService {
 
     @Autowired
     private ShareRepository shareRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     public List<ScheduleEntity> create(final ScheduleEntity entity) {
         scheduleRepository.save(entity);
@@ -129,5 +134,15 @@ public class ScheduleService {
 
     public List<ScheduleEntity> retrieveByCalNo(Long calNo) {
         return scheduleRepository.findByCalendarEntity_CalNo(calNo);
+    }
+
+    public List<Map<String, Object>> search(String email, String name) {
+        return jdbcTemplate.queryForList("select ts.*, email, color" +
+                " from tbl_schedule ts" +
+                " join tbl_calendar tc using(calNo)" +
+                " join tbl_share tsh using(calNo)" +
+                " join tbl_member tm using(email)" +
+                " where ts.name like'%" + name + "%'" +
+                " and email = ?", email);
     }
 }
