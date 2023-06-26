@@ -98,6 +98,16 @@ public class ShareController {
     return ResponseEntity.ok().body(response);
   }
 
+  // 캘린더 번호로 조회
+  @GetMapping("/retrieve/{calNo}")
+    public ResponseEntity<?> retrieveShareByCalNo(@PathVariable Long calNo) {
+    List<ShareEntity> entities = service.retrieveByCalNo(calNo);
+    List<ShareDTO> dtos = entities.stream().map(ShareDTO::new).collect(Collectors.toList());
+    ResponseDTO<ShareDTO> response = ResponseDTO.<ShareDTO>builder().data(dtos).build();
+    return ResponseEntity.ok().body(response);
+}
+
+
   /**
    * methodName : updateShare
    * comment : 캘린더 사용 권한 수정
@@ -120,7 +130,7 @@ public class ShareController {
 
   /**
    * methodName : deleteShare
-   * comment : 캘린더 사용 권한 삭제
+   * comment : 캘린더 사용 권한 삭제-구독 취소
    * author : 박현민
    * date : 2023-06-08
    * description :
@@ -166,7 +176,7 @@ public class ShareController {
     ShareDTO dto = new ShareDTO();
     dto.setCalNo(Long.parseLong(calNo));
     dto.setEmail(receiver);
-    dto.setChecked(false);
+    dto.setChecked(true);
     dto.setGrade(Long.parseLong(grade));
 
     List<ShareEntity> entities = service.retrieveByEmail(receiver);
