@@ -47,7 +47,7 @@ public class OAuthMemberServiceImpl extends DefaultOAuth2UserService {
     private ShareService shareService;
 
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException, NullPointerException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         try {
             log.info("OAuth2 member Info {} ", new ObjectMapper().writeValueAsString(oAuth2User));
@@ -58,6 +58,8 @@ public class OAuthMemberServiceImpl extends DefaultOAuth2UserService {
         final String authProvider = userRequest.getClientRegistration().getClientName();
         log.info("{}", authProvider);
 
+        final String language = oAuth2User.getAttribute("locale");
+        log.warn("language::::::{}", language);
         String email = null;
         if (authProvider.equalsIgnoreCase("google")) {
             email = (String) oAuth2User.getAttribute("email");
@@ -72,7 +74,7 @@ public class OAuthMemberServiceImpl extends DefaultOAuth2UserService {
         MemberEntity memberEntity = null;
         // db탐색 후 중복되는 id가 없을시 신규 id로 등록
         if (!memberRepository.existsByEmail(email)) {
-            memberEntity = MemberEntity.builder().email(email).auth_Provider(authProvider).build();
+            memberEntity = MemberEntity.builder().email(email).auth_Provider(authProvider).language(language).build();
             memberEntity = memberRepository.save(memberEntity);
             CalendarEntity calendar = CalendarEntity.builder()
                     .name(Objects.requireNonNull(email).substring(0, email.indexOf("@")))
@@ -85,6 +87,21 @@ public class OAuthMemberServiceImpl extends DefaultOAuth2UserService {
             ShareEntity shareEntity = ShareEntity.builder().calendarEntity(calendar)
                     .memberEntity(MemberEntity.builder().email(email).build()).checked(true).build();
             shareService.create(shareEntity);
+            if(language.equals("ko")) {
+
+                ShareEntity koreaCalendar = null;
+                koreaCalendar = ShareEntity.builder()
+                        .calendarEntity(CalendarEntity.builder().calNo(90L).build())
+                        .memberEntity(MemberEntity.builder().email(email).build()).checked(true)
+                        .build();
+                shareService.create(koreaCalendar);
+                koreaCalendar = ShareEntity.builder()
+                        .calendarEntity(CalendarEntity.builder().calNo(98L).build())
+                        .memberEntity(MemberEntity.builder().email(email).build()).checked(true)
+                        .build();
+
+                shareService.create(koreaCalendar);
+            }
         } else {
             memberEntity = memberRepository.findByEmail(email);
         }
