@@ -61,12 +61,26 @@ public class EmailController {
     public ResponseEntity<?> sendPasswordMail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
         log.warn(String.valueOf(emailPostDto));
 
-        EmailMessageEntity emailMessage = EmailMessageEntity.builder()
-                .to(emailPostDto.getEmail())
-                .subject("[Woori] 이메일 인증을 위한 인증 코드 발송")
-                .build();
-
-        String code = emailService.sendMail(emailMessage, "password");
+        String code = null;
+        if(emailPostDto.getLanguage().equals("ko-kr")) {
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] 비밀번호 변경을 위한 인증 코드 발송")
+                    .build();
+            code = emailService.sendMail(emailMessage, "ko-password");
+        }else if(emailPostDto.getLanguage().equals("ja")) {
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] パスワード変更のための認証コードの送信")
+                    .build();
+            code = emailService.sendMail(emailMessage, "ja-password");
+        }else{
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] Send verification code for password change")
+                    .build();
+            code = emailService.sendMail(emailMessage, "en-password");
+        }
 
         EmailResponseDTO emailResponseDto = new EmailResponseDTO();
         emailResponseDto.setCode(code);
@@ -89,12 +103,29 @@ public class EmailController {
     public ResponseEntity<?> sendJoinMail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
         log.warn(String.valueOf(emailPostDto));
 
-        EmailMessageEntity emailMessage = EmailMessageEntity.builder()
-                .to(emailPostDto.getEmail())
-                .subject("[Woori] 이메일 인증을 위한 인증 코드 발송")
-                .build();
 
-        String code = emailService.sendMail(emailMessage, "email");
+        String code = null;
+        if(emailPostDto.getLanguage().equals("ko-kr")) {
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] 이메일 인증을 위한 인증 코드 발송")
+                    .build();
+            code = emailService.sendMail(emailMessage, "ko-email");
+        }else if(emailPostDto.getLanguage().equals("ja")) {
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] 電子メール認証用の認証コードを送")
+                    .build();
+            code = emailService.sendMail(emailMessage, "ja-email");
+        }else{
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] Send verification code for email verification")
+                    .build();
+            code = emailService.sendMail(emailMessage, "en-email");
+        }
+
+
 
         EmailResponseDTO emailResponseDto = new EmailResponseDTO();
         emailResponseDto.setCode(code);
@@ -157,12 +188,26 @@ public class EmailController {
     public ResponseEntity<?> sendForgotEmail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
         log.warn(String.valueOf(emailPostDto));
 
-        EmailMessageEntity emailMessage = EmailMessageEntity.builder()
-                .to(emailPostDto.getEmail())
-                .subject("[Woori] 이메일 찾기 입니다")
-                .build();
-
-        String code = emailService.sendMail(emailMessage, "subemail");
+        String code = null;
+        if(emailPostDto.getLanguage().equals("ko-kr")) {
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] 이메일 찾기 입니다")
+                    .build();
+            code = emailService.sendMail(emailMessage, "ko-subemail");
+        }else if(emailPostDto.getLanguage().equals("ja")) {
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] 電子メールアカウント 検索です")
+                    .build();
+            code = emailService.sendMail(emailMessage, "ja-subemail");
+        }else{
+            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                    .to(emailPostDto.getEmail())
+                    .subject("[Woori] email account is to find")
+                    .build();
+            code = emailService.sendMail(emailMessage, "en-subemail");
+        }
 
         EmailResponseDTO emailResponseDto = new EmailResponseDTO();
         emailResponseDto.setCode(code);

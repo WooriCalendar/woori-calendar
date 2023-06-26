@@ -79,6 +79,7 @@ public class MemberController {
      */
     @PostMapping("signup")
     public ResponseEntity<?> registerMember(@RequestBody MemberDTO memberDTO, CalendarDTO calendarDTO) {
+        log.warn("사인업호출됨");
         try {
             if (memberDTO == null || memberDTO.getPassword() == null) {
                 throw new RuntimeException("Invalid Password value.");
@@ -274,15 +275,29 @@ public class MemberController {
                             .build();
                 }else if(memberDTO.getSubemail() != null){
                     log.warn("subemail 호출::"+memberDTO.getSubemail());
-                    if(memberService.findBySubEmail(memberDTO.getSubemail()) !=null){
-                    member = memberService.findBySubEmail(memberDTO.getSubemail());
+                    if(memberService.findBySubEmail(memberDTO.getSubemail()) !=null) {
+                        member = memberService.findBySubEmail(memberDTO.getSubemail());
 
-                    EmailMessageEntity emailMessage = EmailMessageEntity.builder()
-                            .to(member.getSubemail())
-                            .subject("[Woori] 이메일 찾기 입니다")
-                            .build();
-
-                    emailService.sendsubEmail(emailMessage, "subemail", member.getEmail());
+                        if (member.getLanguage().equals("ko")) {
+                            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                                    .to(member.getSubemail())
+                                    .subject("[Woori] 이메일 찾기 입니다")
+                                    .build();
+                            emailService.sendsubEmail(emailMessage, "ko-subemail", member.getEmail());
+                        } else if (member.getLanguage().equals("ja")) {
+                            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                                    .to(member.getSubemail())
+                                    .subject("[Woori] 電子メールアカウントを探す")
+                                    .build();
+                            emailService.sendsubEmail(emailMessage, "ja-subemail", member.getEmail());
+                        } else {
+                            EmailMessageEntity emailMessage = EmailMessageEntity.builder()
+                                    .to(member.getSubemail())
+                                    .subject("[Woori] Looking for an email account")
+                                    .build();
+                            emailService.sendsubEmail(emailMessage, "en-subemail", member.getEmail());
+                        }
+                    }
 
 //                    EmailResponseDTO emailResponseDto = new EmailResponseDTO();
 //                    emailResponseDto.setCode(code);
@@ -301,7 +316,6 @@ public class MemberController {
                                 .subemail(member.getSubemail())
                                 .build();
                     }
-                }
             return ResponseEntity.ok().body(responseMemberDTO);
         } catch (NullPointerException nullPointerException) {
             log.warn("nullPoint");
