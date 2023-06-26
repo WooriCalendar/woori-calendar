@@ -51,7 +51,7 @@ public class ScheduleDTO {
 
     private boolean status;
 
-     private String dayOfWeek;
+    private String dayOfWeek;
 
 //    public ScheduleDTO(Long scNo, String title, String comment, String place, String start, String end, Date regDate, Date updateDate, Long calNo) {
 //        this.scNo = scNo;
@@ -75,7 +75,7 @@ public class ScheduleDTO {
             SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             this.start = dtFormat.format(entity.getStartDate());
-            this.end = dtFormat.format(entity.getEndDate());
+            this.end = dtFormat.format(entity.getEndDate()).substring(0, dtFormat.format(entity.getEndDate()).length() - 2) + (Integer.parseInt(dtFormat.format(entity.getEndDate()).substring(dtFormat.format(entity.getEndDate()).length() - 2)) + 1);
 
             if (entity.getCalendarEntity().getCalNo() != 90 && entity.getCalendarEntity().getCalNo() != 98) {
                 LocalDate date = LocalDate.of(entity.getStartDate().getYear(), entity.getStartDate().getMonth(), entity.getStartDate().getDate() -2);

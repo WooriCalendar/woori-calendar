@@ -2,8 +2,10 @@ package com.ceojun7.wooricalendar.controller;
 
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.dto.ScheduleDTO;
+import com.ceojun7.wooricalendar.dto.ShareDTO;
 import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.ScheduleEntity;
+import com.ceojun7.wooricalendar.model.ShareEntity;
 import com.ceojun7.wooricalendar.service.CalendarService;
 import com.ceojun7.wooricalendar.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -134,4 +137,19 @@ public class ScheduleController {
         }
     }
 
+    @PostMapping("/search")
+    public ResponseEntity<?> searchSchedule(@AuthenticationPrincipal String email, @RequestBody ScheduleDTO dto) {
+//        List<Map<String, Object>> entities = service.search(email, dto.getTitle());
+//        List<ShareDTO> dtos = entities.stream().map(ShareDTO).collect(Collectors.toList());
+//        ResponseDTO<ShareDTO> response = ResponseDTO.<ShareDTO>builder().data(dtos).build();
+        return ResponseEntity.ok().body(service.search(email, dto.getTitle()));
+    }
+
+//    @GetMapping
+//    public ResponseEntity<?> retrieveSchedule(@AuthenticationPrincipal String email) {
+//        List<ScheduleEntity> entities = service.retrieveByEmail(email);
+//        List<ScheduleDTO> dtos = entities.stream().map(ScheduleDTO::new).collect(Collectors.toList());
+//        ResponseDTO<ScheduleDTO> response = ResponseDTO.<ScheduleDTO>builder().data(dtos).build();
+//        return ResponseEntity.ok().body(response);
+//    }
 }
