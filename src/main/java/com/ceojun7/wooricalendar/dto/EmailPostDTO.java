@@ -18,4 +18,5 @@ import lombok.Getter;
 @Data
 public class EmailPostDTO {
     private String email;
+    private String language;
 }
