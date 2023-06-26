@@ -6,7 +6,15 @@ import com.ceojun7.wooricalendar.security.TokenProvider;
 import com.ceojun7.wooricalendar.service.*;
 
 import lombok.RequiredArgsConstructor;
+import com.ceojun7.wooricalendar.service.CalendarService;
+import com.ceojun7.wooricalendar.service.MemberService;
+import com.ceojun7.wooricalendar.service.NotificationService;
+import com.ceojun7.wooricalendar.service.ScheduleService;
+import com.ceojun7.wooricalendar.service.ShareService;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.XML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
@@ -14,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +41,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * @author : DGeon
@@ -58,6 +67,12 @@ public class MemberController {
     private final ShareService shareService;
     private final ScheduleService scheduleService;
     private final EmailService emailService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private ScheduleService scheduleService;
 
     /**
      * methodName : registerMember
@@ -351,6 +366,45 @@ public class MemberController {
         return new ResponseEntity<>("회원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
     }
 
+    @DeleteMapping
+    public ResponseEntity<?> deleteMember(@AuthenticationPrincipal String email) {
+        List<ScheduleEntity> scheduleEntityList = scheduleService.retrieveByEmail(email); // 캘린더 번호를 통하여 일정 조회
+
+        // 일정 삭제
+        for (ScheduleEntity scheduleEntity : scheduleEntityList) {
+            scheduleService.delete(scheduleEntity);
+        }
+
+        // 공유된 일정 삭제 및 캘린더 삭제
+        List<ShareEntity> shareEntityList = shareService.retrieveByEmail(email);
+        if (shareEntityList.size() == 1) {
+            // 공유된 일정이 한 명에게만 공유되었을 경우 캘린더 삭제
+            ShareEntity shareEntity = shareEntityList.get(0);
+            shareService.delete(shareEntity); // 공유 삭제
+            CalendarEntity calendarEntity = shareEntity.getCalendarEntity();
+            calendarService.delete(calendarEntity); // 캘린더 삭제
+        } else {
+            // 공유된 일정이 여러 명에게 공유되었을 경우에는 공유만 삭제
+            for (ShareEntity shareEntity : shareEntityList) {
+                shareService.delete(shareEntity); // 공유 삭제
+            }
+        }
+
+        // 알림 삭제
+        List<NotificationEntity> notificationEntities = notificationService.retrieve(email);
+        for (NotificationEntity notificationEntity : notificationEntities) {
+            notificationService.delete(notificationEntity);
+        }
+
+        // 멤버 삭제
+        MemberEntity memberEntity = memberService.findByEmail(email);
+        if (memberEntity != null) {
+            memberService.deleteMember(memberEntity);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     /**
      * methodName : cal
