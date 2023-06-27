@@ -86,21 +86,23 @@ public class ScheduleService {
      */
     public List<ScheduleEntity> update(final ScheduleEntity entity) {
         final List<ScheduleEntity> originalList = scheduleRepository
-                .findByCalendarEntity_CalNo(entity.getCalendarEntity().getCalNo());
+                .findByScNo(entity.getScNo());
         if (!originalList.isEmpty()) {
             ScheduleEntity original = originalList.get(0);
+            // original.setScNo(entity.getScNo());
             original.setComment(entity.getComment());
             original.setName(entity.getName());
             original.setStartDate(entity.getStartDate());
             original.setEndDate(entity.getEndDate());
+            original.setStartTime(entity.getStartTime());
+            original.setEndTime(entity.getEndTime());
             original.setPlace(entity.getPlace());
             original.setRePeriod(entity.getRePeriod());
 
             scheduleRepository.save(original);
         }
-        List<ScheduleEntity> updatedList = scheduleRepository
-                .findByCalendarEntity_CalNo(entity.getCalendarEntity().getCalNo());
-        return updatedList;
+
+        return originalList;
     }
 
     /**
