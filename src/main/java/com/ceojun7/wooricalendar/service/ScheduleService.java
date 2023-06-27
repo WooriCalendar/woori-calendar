@@ -89,7 +89,6 @@ public class ScheduleService {
                 .findByScNo(entity.getScNo());
         if (!originalList.isEmpty()) {
             ScheduleEntity original = originalList.get(0);
-            // original.setScNo(entity.getScNo());
             original.setComment(entity.getComment());
             original.setName(entity.getName());
             original.setStartDate(entity.getStartDate());
@@ -101,7 +100,6 @@ public class ScheduleService {
 
             scheduleRepository.save(original);
         }
-
         return originalList;
     }
 
