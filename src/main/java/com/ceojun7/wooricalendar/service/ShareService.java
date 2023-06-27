@@ -3,6 +3,7 @@ package com.ceojun7.wooricalendar.service;
 import java.util.Date;
 import java.util.List;
 
+import com.ceojun7.wooricalendar.model.MemberEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -135,16 +136,24 @@ public class ShareService {
 
     if (entities.size() == 1) { // 구독자가 한명이면(나만)
       if (scheduleEntities.size() > 0) { // 일정이 하나 이상 존재하면
-        for (int i = 0; i < scheduleEntities.size(); i++) { // 모든 일정 탐색
-          scheduleRepository.delete(scheduleEntities.get(i)); // 모든 일정 삭제
-        }
+        // 모든 일정 탐색
+        // 모든 일정 삭제
+        scheduleRepository.deleteAll(scheduleEntities);
       }
       shareRepository.delete(shareEntity); // 구독 취소
-      calendarService.delete(calendarRepository.findByCalNo(calNo).get(0)); // 캘린더 삭제
+      if(calNo != 98L && calNo != 90L) {
+        calendarService.delete(calendarRepository.findByCalNo(calNo).get(0)); // 캘린더 삭제
+      }
     }
     shareRepository.delete(shareEntity); // 구독자가 여러명일 경우 구독취소만 됨
 
     return shareRepository.findByShareNo(shareEntity.getShareNo());
   }
+
+//  public void deleteList(MemberEntity memberEntity){
+//    log.warn("구독취소");
+//    shareRepository.deleteAllByMemberEntity_Email(memberEntity.getEmail());
+//  }
+
 
 }
