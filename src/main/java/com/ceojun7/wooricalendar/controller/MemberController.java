@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -63,7 +64,7 @@ public class MemberController {
     private final ShareService shareService;
     private final ScheduleService scheduleService;
     private final EmailService emailService;
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
     /**
      * methodName : registerMember
@@ -372,43 +373,65 @@ public class MemberController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteMember(@AuthenticationPrincipal String email) {
-        List<ScheduleEntity> scheduleEntityList = scheduleService.retrieveByEmail(email); // 캘린더 번호를 통하여 일정 조회
+    @Transactional
+    public void deleteMember(@AuthenticationPrincipal String email){
+//        List<ScheduleEntity> scheduleEntityList = scheduleService.retrieveByEmail(email); // 캘린더 번호를 통하여 일정 조회
+//
+//        // 일정 삭제
+//        for (ScheduleEntity scheduleEntity : scheduleEntityList) {
+//            scheduleService.delete(scheduleEntity);
+//        }
+//
+//        // 공유된 일정 삭제 및 캘린더 삭제
+//        List<ShareEntity> shareEntityList = shareService.retrieveByEmail(email);
+//        if (shareEntityList.size() == 1) {
+//            // 공유된 일정이 한 명에게만 공유되었을 경우 캘린더 삭제
+//            ShareEntity shareEntity = shareEntityList.get(0);
+//            shareService.delete(shareEntity); // 공유 삭제
+//            CalendarEntity calendarEntity = shareEntity.getCalendarEntity();
+//            calendarService.delete(calendarEntity); // 캘린더 삭제
+//        } else {
+//            // 공유된 일정이 여러 명에게 공유되었을 경우에는 공유만 삭제
+//            for (ShareEntity shareEntity : shareEntityList) {
+//                shareService.delete(shareEntity); // 공유 삭제
+//            }
+//        }
+//
+//        // 알림 삭제
+//        List<NotificationEntity> notificationEntities = notificationService.retrieve(email);
+//        for (NotificationEntity notificationEntity : notificationEntities) {
+//            notificationService.delete(notificationEntity);
+//        }
+//
+//        // 멤버 삭제
+//        MemberEntity memberEntity = memberService.findByEmail(email);
+//        if (memberEntity != null) {
+//            memberService.deleteMember(memberEntity);
+//            return ResponseEntity.ok().build();
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+            MemberEntity member = memberService.findByEmail(email);
 
-        // 일정 삭제
-        for (ScheduleEntity scheduleEntity : scheduleEntityList) {
-            scheduleService.delete(scheduleEntity);
-        }
-
-        // 공유된 일정 삭제 및 캘린더 삭제
-        List<ShareEntity> shareEntityList = shareService.retrieveByEmail(email);
-        if (shareEntityList.size() == 1) {
-            // 공유된 일정이 한 명에게만 공유되었을 경우 캘린더 삭제
-            ShareEntity shareEntity = shareEntityList.get(0);
-            shareService.delete(shareEntity); // 공유 삭제
-            CalendarEntity calendarEntity = shareEntity.getCalendarEntity();
-            calendarService.delete(calendarEntity); // 캘린더 삭제
-        } else {
-            // 공유된 일정이 여러 명에게 공유되었을 경우에는 공유만 삭제
-            for (ShareEntity shareEntity : shareEntityList) {
-                shareService.delete(shareEntity); // 공유 삭제
+            if(shareService.retrieveByEmail(email) != null){
+                List<ShareEntity> shareEntities = shareService.retrieveByEmail(email);
+                for (ShareEntity shareEntity : shareEntities) {
+                    shareService.delete(shareEntity);
+                }
             }
-        }
 
-        // 알림 삭제
-        List<NotificationEntity> notificationEntities = notificationService.retrieve(email);
-        for (NotificationEntity notificationEntity : notificationEntities) {
-            notificationService.delete(notificationEntity);
-        }
-
-        // 멤버 삭제
-        MemberEntity memberEntity = memberService.findByEmail(email);
-        if (memberEntity != null) {
-            memberService.deleteMember(memberEntity);
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+            if(!(notificationService.retrieve(email).isEmpty())){
+                List<NotificationEntity> notificationEntities = notificationService.retrieve(email);
+                for (NotificationEntity notificationEntity : notificationEntities){
+                    notificationService.delete(notificationEntity);
+                }
+            }
+            memberService.deleteMember(member);
+//        List<ShareEntity> shareEntities = shareService.retrieveByEmail(email);
+//        for(int i=0; i<=shareEntities.size(); i++){
+//            shareService.delete(shareEntities.get(i));
+//        }
+//        return ResponseEntity.ok().build();
     }
 
     /**
