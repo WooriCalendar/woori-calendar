@@ -198,10 +198,6 @@ public class ShareController {
         return null;
       }
     }
-    // 알림보내기
-    // 보낼 내용 : receiver가 캘린더 초대를 수락했습니다.
-    // 보낸 사람 : system
-    // 받을 사람 : inviteDTO의 email(초대한 사람)
 
     CalendarEntity calendarEntity = calendarService.retrieve(longCalNo).get(0); //캘린더 정보 가져오기
     List<ShareEntity> shareEntityList = service.retrieveByCalNo(longCalNo); // 구독자 목록들 가져오기
