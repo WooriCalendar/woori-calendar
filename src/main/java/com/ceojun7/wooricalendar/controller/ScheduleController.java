@@ -4,10 +4,13 @@ import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.dto.ScheduleDTO;
 import com.ceojun7.wooricalendar.dto.ShareDTO;
 import com.ceojun7.wooricalendar.model.CalendarEntity;
+import com.ceojun7.wooricalendar.model.NotificationEntity;
 import com.ceojun7.wooricalendar.model.ScheduleEntity;
 import com.ceojun7.wooricalendar.model.ShareEntity;
 import com.ceojun7.wooricalendar.service.CalendarService;
+import com.ceojun7.wooricalendar.service.NotificationService;
 import com.ceojun7.wooricalendar.service.ScheduleService;
+import com.ceojun7.wooricalendar.service.ShareService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +47,12 @@ public class ScheduleController {
     @Autowired
     private CalendarService calendarService;
 
+    @Autowired
+    private ShareService shareService;
+
+    @Autowired
+    private NotificationService notificationService;
+
     /**
      * methodName : createSchedule
      * comment : 일정 생성
@@ -63,6 +72,24 @@ public class ScheduleController {
                 entity.setCalendarEntity(CalendarEntity.builder().calNo(calendarService.retrieveByEmail(email).stream().filter(calendarEntity -> calendarEntity.getName().equals(email)).collect(Collectors.toList()).get(0).getCalNo()).build());
             }
             List<ScheduleEntity> entities = service.create(entity);
+
+            CalendarEntity calendarEntity = calendarService.retrieve(dto.getCalNo()).get(0);//캘린더 정보 가져오기
+
+            List<ShareEntity> shareEntityList = shareService.retrieveByCalNo(dto.getCalNo()); // 구독자 목록들 가져오기
+
+            for(int i=0; i < shareEntityList.size(); i++){
+                NotificationEntity notificationEntity = NotificationEntity
+                        .builder()
+                        .sendEmail(calendarEntity.getName()) //캘린더이름
+                        .revEmail(shareEntityList.get(i).getMemberEntity().getEmail()) //캘린더구독자들
+                        .comment('"' + email + '"' +" 님께서 " +  '"' + dto.getTitle() + '"' + " 일정을 생성하셨습니다!") //
+                        .type("create") // 캘린더구독
+                        .calendarEntity(CalendarEntity.builder().calNo(dto.getCalNo()).build())
+                        .build();
+                notificationService.create(notificationEntity);
+            }
+
+
             List<ScheduleDTO> dtos = entities.stream().map(ScheduleDTO::new).collect(Collectors.toList());
             ResponseDTO<ScheduleDTO> response = ResponseDTO.<ScheduleDTO>builder().data(dtos).build();
             return ResponseEntity.ok().body(response);
