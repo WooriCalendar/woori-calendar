@@ -4,6 +4,7 @@ import com.ceojun7.wooricalendar.dto.CalendarDTO;
 import com.ceojun7.wooricalendar.dto.NotificationDTO;
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.model.NotificationEntity;
+import com.ceojun7.wooricalendar.persistence.NotificationRepository;
 import com.ceojun7.wooricalendar.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class NotificationController {
 
     @Autowired
     private NotificationService service;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     /**
      * methodName : createNotification
@@ -112,9 +116,9 @@ public class NotificationController {
      * @return the response entity
      */
     @DeleteMapping
-    public ResponseEntity<?> deleteNotification(@RequestBody NotificationDTO dto) {
+    public ResponseEntity<?> deleteNotification(@RequestBody Long ntNo) {
         try {
-            NotificationEntity entity = NotificationDTO.toEntity(dto);
+            NotificationEntity entity = notificationRepository.findByNtNo(ntNo);
 
             List<NotificationEntity> entities = service.delete(entity);
 
