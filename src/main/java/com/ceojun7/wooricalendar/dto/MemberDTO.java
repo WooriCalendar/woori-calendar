@@ -33,24 +33,24 @@ public class MemberDTO {
     private String subemail;
     private String language;
     private Date birthday;
+    private String auth_Provider;
 
-
-    public MemberDTO(final MemberEntity  memberEntity) {
-        if(memberEntity.getPassword() != null) {
+    public MemberDTO(final MemberEntity memberEntity) {
+        if (memberEntity.getPassword() != null) {
             this.email = memberEntity.getEmail();
             this.password = memberEntity.getPassword();
-        }else if(memberEntity.getSubemail() != null && memberEntity.getEmail() !=null){
+        } else if (memberEntity.getSubemail() != null && memberEntity.getEmail() != null) {
             this.subemail = memberEntity.getSubemail();
             this.email = memberEntity.getEmail();
-        }else if(memberEntity.getSubemail() != null){
+        } else if (memberEntity.getSubemail() != null) {
             this.subemail = memberEntity.getSubemail();
         }
     }
 
     public static MemberEntity toEntity(final MemberDTO memberDTO) {
-        if(memberDTO.getPassword() != null) {
+        if (memberDTO.getPassword() != null) {
             return MemberEntity.builder().email(memberDTO.getEmail()).password(memberDTO.getPassword()).build();
-        }else{
+        } else {
             return MemberEntity.builder().email(memberDTO.getEmail()).build();
         }
     }

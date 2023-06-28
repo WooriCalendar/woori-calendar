@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.management.Notification;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ceojun7.wooricalendar.model.NotificationEntity;
+import com.ceojun7.wooricalendar.service.CalendarService;
+import com.ceojun7.wooricalendar.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +48,13 @@ public class ShareController {
 
   @Autowired
   private ShareRepository repository;
+
+  @Autowired
+  private NotificationService notificationService;
+
+  @Autowired
+  private CalendarService calendarService;
+
 
   /**
    * methodName : createShare
@@ -187,14 +198,26 @@ public class ShareController {
         return null;
       }
     }
-    // 알림보내기
-    // 보낼 내용 : receiver가 캘린더 초대를 수락했습니다.
-    // 보낸 사람 : system
-    // 받을 사람 : inviteDTO의 email(초대한 사람)
+
+    CalendarEntity calendarEntity = calendarService.retrieve(longCalNo).get(0); //캘린더 정보 가져오기
+    List<ShareEntity> shareEntityList = service.retrieveByCalNo(longCalNo); // 구독자 목록들 가져오기
+
 
     ShareEntity entity = ShareDTO.toEntity(dto);
     service.create(entity);
     response.sendRedirect("http://localhost:3000/");
+
+    for(int i=0; i < shareEntityList.size(); i++){
+      NotificationEntity notificationEntity = NotificationEntity
+              .builder()
+              .sendEmail(calendarEntity.getName()) //캘린더이름
+              .revEmail(shareEntityList.get(i).getMemberEntity().getEmail()) //캘린더구독자들
+              .comment('"' + receiver + '"' +" 님께서 " +  '"' + calendarEntity.getName() + '"' + " 캘린더를 구독하셨어요!") //
+              .type("subscribe") // 캘린더구독
+              .calendarEntity(CalendarEntity.builder().calNo(longCalNo).build())
+              .build();
+      notificationService.create(notificationEntity);
+    }
     return null;
   }
 }

@@ -3,14 +3,17 @@ package ws;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Setter
 @Getter
 public class ChatMessage {
 
-  private MessageType type;
-  private String content;
-  private String sender;
-  private Double lon;
-  private Double lat;
-
+  private String sendEmail;
+  private String revEmail;
+  private String comment;
+  private String type;
+  private Date sdate;
+  private Date rdate;
+  private Long calNo;
 }
