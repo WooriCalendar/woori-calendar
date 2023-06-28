@@ -97,6 +97,7 @@ public class ScheduleService {
             original.setEndTime(entity.getEndTime());
             original.setPlace(entity.getPlace());
             original.setRePeriod(entity.getRePeriod());
+            original.setReEndDate(entity.getReEndDate());
 
             scheduleRepository.save(original);
         }
