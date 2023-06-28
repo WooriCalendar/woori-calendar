@@ -69,26 +69,29 @@ public class ScheduleController {
         try {
             ScheduleEntity entity = ScheduleDTO.toEntity(dto);
             if (dto.getCalNo() == null) {
-                entity.setCalendarEntity(CalendarEntity.builder().calNo(calendarService.retrieveByEmail(email).stream().filter(calendarEntity -> calendarEntity.getName().equals(email)).collect(Collectors.toList()).get(0).getCalNo()).build());
+                entity.setCalendarEntity(CalendarEntity.builder()
+                        .calNo(calendarService.retrieveByEmail(email).stream()
+                                .filter(calendarEntity -> calendarEntity.getName().equals(email))
+                                .collect(Collectors.toList()).get(0).getCalNo())
+                        .build());
             }
             List<ScheduleEntity> entities = service.create(entity);
 
-            CalendarEntity calendarEntity = calendarService.retrieve(dto.getCalNo()).get(0);//캘린더 정보 가져오기
+            CalendarEntity calendarEntity = calendarService.retrieve(dto.getCalNo()).get(0);// 캘린더 정보 가져오기
 
             List<ShareEntity> shareEntityList = shareService.retrieveByCalNo(dto.getCalNo()); // 구독자 목록들 가져오기
 
-            for(int i=0; i < shareEntityList.size(); i++){
+            for (int i = 0; i < shareEntityList.size(); i++) {
                 NotificationEntity notificationEntity = NotificationEntity
                         .builder()
-                        .sendEmail(calendarEntity.getName()) //캘린더이름
-                        .revEmail(shareEntityList.get(i).getMemberEntity().getEmail()) //캘린더구독자들
-                        .comment('"' + email + '"' +" 님께서 " +  '"' + dto.getTitle() + '"' + " 일정을 생성하셨습니다!") //
+                        .sendEmail(calendarEntity.getName()) // 캘린더이름
+                        .revEmail(shareEntityList.get(i).getMemberEntity().getEmail()) // 캘린더구독자들
+                        .comment('"' + email + '"' + " 님께서 " + '"' + dto.getTitle() + '"' + " 일정을 생성하셨습니다!") //
                         .type("create") // 캘린더구독
                         .calendarEntity(CalendarEntity.builder().calNo(dto.getCalNo()).build())
                         .build();
                 notificationService.create(notificationEntity);
             }
-
 
             List<ScheduleDTO> dtos = entities.stream().map(ScheduleDTO::new).collect(Collectors.toList());
             ResponseDTO<ScheduleDTO> response = ResponseDTO.<ScheduleDTO>builder().data(dtos).build();
@@ -150,24 +153,29 @@ public class ScheduleController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteSchedule(@RequestBody ScheduleDTO dto, @AuthenticationPrincipal String email) {
-        log.warn(String.valueOf(dto));
+    public ResponseEntity<?> deleteSchedule(@RequestBody Long scNo, @AuthenticationPrincipal String email) {
+        log.warn("scNo");
         try {
-            ScheduleEntity entity = ScheduleDTO.toEntity(dto);
+
+            ScheduleEntity entity = service.retrieve(scNo).get(0);
             List<ScheduleEntity> entities = service.delete(entity);
 
-            CalendarEntity calendarEntity = calendarService.retrieve(dto.getCalNo()).get(0);//캘린더 정보 가져오기
+            CalendarEntity calendarEntity = calendarService.retrieve(entity.getCalendarEntity().getCalNo()).get(0);// 캘린더
+                                                                                                                   // 정보
+                                                                                                                   // 가져오기
 
-            List<ShareEntity> shareEntityList = shareService.retrieveByCalNo(dto.getCalNo()); // 구독자 목록들 가져오기
+            List<ShareEntity> shareEntityList = shareService.retrieveByCalNo(entity.getCalendarEntity().getCalNo()); // 구독자
+                                                                                                                     // 목록들
+                                                                                                                     // 가져오기
 
-            for(int i=0; i < shareEntityList.size(); i++){
+            for (int i = 0; i < shareEntityList.size(); i++) {
                 NotificationEntity notificationEntity = NotificationEntity
                         .builder()
-                        .sendEmail(calendarEntity.getName()) //캘린더이름
-                        .revEmail(shareEntityList.get(i).getMemberEntity().getEmail()) //캘린더구독자들
-                        .comment('"' + email + '"' +" 님께서 " +  '"' + dto.getTitle() + '"' + " 일정을 삭제하셨습니다!") //
+                        .sendEmail(calendarEntity.getName()) // 캘린더이름
+                        .revEmail(shareEntityList.get(i).getMemberEntity().getEmail()) // 캘린더구독자들
+                        .comment('"' + email + '"' + " 님께서 " + '"' + entity.getName() + '"' + " 일정을 삭제하셨습니다!") //
                         .type("create") // 캘린더구독
-                        .calendarEntity(CalendarEntity.builder().calNo(dto.getCalNo()).build())
+                        .calendarEntity(CalendarEntity.builder().calNo(entity.getCalendarEntity().getCalNo()).build())
                         .build();
                 notificationService.create(notificationEntity);
             }
@@ -182,17 +190,22 @@ public class ScheduleController {
 
     @PostMapping("/search")
     public ResponseEntity<?> searchSchedule(@AuthenticationPrincipal String email, @RequestBody ScheduleDTO dto) {
-//        List<Map<String, Object>> entities = service.search(email, dto.getTitle());
-//        List<ShareDTO> dtos = entities.stream().map(ShareDTO).collect(Collectors.toList());
-//        ResponseDTO<ShareDTO> response = ResponseDTO.<ShareDTO>builder().data(dtos).build();
+        // List<Map<String, Object>> entities = service.search(email, dto.getTitle());
+        // List<ShareDTO> dtos =
+        // entities.stream().map(ShareDTO).collect(Collectors.toList());
+        // ResponseDTO<ShareDTO> response =
+        // ResponseDTO.<ShareDTO>builder().data(dtos).build();
         return ResponseEntity.ok().body(service.search(email, dto.getTitle()));
     }
 
-//    @GetMapping
-//    public ResponseEntity<?> retrieveSchedule(@AuthenticationPrincipal String email) {
-//        List<ScheduleEntity> entities = service.retrieveByEmail(email);
-//        List<ScheduleDTO> dtos = entities.stream().map(ScheduleDTO::new).collect(Collectors.toList());
-//        ResponseDTO<ScheduleDTO> response = ResponseDTO.<ScheduleDTO>builder().data(dtos).build();
-//        return ResponseEntity.ok().body(response);
-//    }
+    // @GetMapping
+    // public ResponseEntity<?> retrieveSchedule(@AuthenticationPrincipal String
+    // email) {
+    // List<ScheduleEntity> entities = service.retrieveByEmail(email);
+    // List<ScheduleDTO> dtos =
+    // entities.stream().map(ScheduleDTO::new).collect(Collectors.toList());
+    // ResponseDTO<ScheduleDTO> response =
+    // ResponseDTO.<ScheduleDTO>builder().data(dtos).build();
+    // return ResponseEntity.ok().body(response);
+    // }
 }
