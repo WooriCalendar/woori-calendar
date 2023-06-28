@@ -12,6 +12,7 @@ import com.ceojun7.wooricalendar.service.CalendarService;
 import com.ceojun7.wooricalendar.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
@@ -151,14 +152,27 @@ public class ShareController {
    */
   @DeleteMapping
   public ResponseEntity<?> deleteShare(@RequestBody Long shareNo) {
-    log.warn("===========넘어옴====" + shareNo);
     try {
-
-      ShareEntity entity = ShareEntity.builder()
-          .shareNo(shareNo)
-          .build();// 쉐어 넘버만 있는 엔티티 나머지 null
+      ShareEntity entity = service.retrieve(shareNo).get(0);
 
       List<ShareEntity> entities = service.delete(entity);
+
+      CalendarEntity calendarEntity = calendarService.retrieve(entity.getCalendarEntity().getCalNo()).get(0);//캘린더 정보 가져오기
+
+      List<ShareEntity> shareEntityList = service.retrieveByCalNo(entity.getCalendarEntity().getCalNo()); // 구독자 목록들 가져오기
+
+      for(int i=0; i < shareEntityList.size(); i++){
+        NotificationEntity notificationEntity = NotificationEntity
+                .builder()
+                .sendEmail(calendarEntity.getName()) //캘린더이름
+                .revEmail(shareEntityList.get(i).getMemberEntity().getEmail()) //캘린더구독자들
+                .comment('"' + entity.getMemberEntity().getEmail() + '"' + " 님께서 " +  '"' + entity.getCalendarEntity().getName() + '"' + " 캘린더 공유를 취소하셨어요.") //
+                .type("unsubscribe") // 캘린더구독
+                .calendarEntity(CalendarEntity.builder().calNo(entity.getCalendarEntity().getCalNo()).build())
+                .build();
+        notificationService.create(notificationEntity);
+      }
+
       List<ShareDTO> dtos = entities.stream().map(ShareDTO::new).collect(Collectors.toList());
       ResponseDTO<ShareDTO> response = ResponseDTO.<ShareDTO>builder().data(dtos).build();
 
