@@ -99,6 +99,9 @@ public class ScheduleService {
             original.setRePeriod(entity.getRePeriod());
             original.setReEndDate(entity.getReEndDate());
 
+            CalendarEntity newCalendar = entity.getCalendarEntity();
+            original.setCalendarEntity(newCalendar);
+
             scheduleRepository.save(original);
         }
         return originalList;
