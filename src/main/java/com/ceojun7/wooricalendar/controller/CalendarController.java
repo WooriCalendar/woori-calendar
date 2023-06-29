@@ -3,11 +3,9 @@ package com.ceojun7.wooricalendar.controller;
 import com.ceojun7.wooricalendar.dto.CalendarDTO;
 import com.ceojun7.wooricalendar.dto.ResponseDTO;
 import com.ceojun7.wooricalendar.dto.ShareDTO;
-import com.ceojun7.wooricalendar.model.CalendarEntity;
-import com.ceojun7.wooricalendar.model.MemberEntity;
-import com.ceojun7.wooricalendar.model.ScheduleEntity;
-import com.ceojun7.wooricalendar.model.ShareEntity;
+import com.ceojun7.wooricalendar.model.*;
 import com.ceojun7.wooricalendar.service.CalendarService;
+import com.ceojun7.wooricalendar.service.NotificationService;
 import com.ceojun7.wooricalendar.service.ScheduleService;
 import com.ceojun7.wooricalendar.service.ShareService;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +64,9 @@ public class CalendarController {
 
     @Autowired
     private ShareService shareService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * methodName : createSchedule
@@ -168,7 +169,7 @@ public class CalendarController {
      * 
      */
     @DeleteMapping
-    public ResponseEntity<?> deleteCalendar(@RequestBody Long calNo) {
+    public ResponseEntity<?> deleteCalendar(@RequestBody Long calNo, @AuthenticationPrincipal String email) {
         try {
 
             CalendarEntity calendarEntity = service.retrieve(calNo).get(0); //캘린더 번호를 통하여 캘린더 엔티티 조회
@@ -185,6 +186,18 @@ public class CalendarController {
                 for(int i = 0; i < shareEntityList.size(); i++) {
                     shareService.delete(shareEntityList.get(i)); // 모든 공유 삭제
                 }
+            }
+
+            for (ShareEntity shareEntity : shareEntityList) {
+                NotificationEntity notificationEntity = NotificationEntity
+                        .builder()
+                        .sendEmail(calendarEntity.getName()) //캘린더이름
+                        .revEmail(shareEntity.getMemberEntity().getEmail()) //캘린더구독자들
+                        .comment('"'+ email + '"' + "님이" + '"' + calendarEntity.getName() + '"' + " 캘린더를 삭제하셨어요.") //
+                        .type("delete") // 캘린더구독
+                        .calendarEntity(CalendarEntity.builder().calNo(1L).build())
+                        .build();
+                notificationService.create(notificationEntity);
             }
 
             // 일정과 공유를 삭제했으니, 이제 캘린더 삭제

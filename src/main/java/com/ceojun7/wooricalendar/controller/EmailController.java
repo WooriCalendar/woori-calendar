@@ -6,8 +6,10 @@ import com.ceojun7.wooricalendar.dto.EmailResponseDTO;
 import com.ceojun7.wooricalendar.dto.InviteDTO;
 import com.ceojun7.wooricalendar.model.CalendarEntity;
 import com.ceojun7.wooricalendar.model.EmailMessageEntity;
+import com.ceojun7.wooricalendar.model.NotificationEntity;
 import com.ceojun7.wooricalendar.service.CalendarService;
 import com.ceojun7.wooricalendar.service.EmailService;
+import com.ceojun7.wooricalendar.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +46,8 @@ import javax.mail.MessagingException;
 @Slf4j
 public class EmailController {
     private final EmailService emailService;
+
+    private final NotificationService notificationService;
 
     /**
      * methodName : sendPasswordMail
@@ -126,8 +130,6 @@ public class EmailController {
             code = emailService.sendMail(emailMessage, "en-email");
         }
 
-
-
         EmailResponseDTO emailResponseDto = new EmailResponseDTO();
         emailResponseDto.setCode(code);
         log.warn(code);
@@ -154,11 +156,20 @@ public class EmailController {
 
         EmailMessageEntity emailMessage = EmailMessageEntity.builder()
                 .to(inviteDTO.getEmail())
-                .subject(email + "님이 " + "[ " + inviteDTO.getName() + " ] 캘린더를 공유했습니다.")
+                .subject(email + "님이 " + '"' + inviteDTO.getName() + '"' + "캘린더를 공유했습니다.")
                 .build();
 
         Map<String, Object> data = emailService.sendInviteMail(emailMessage, "invite", inviteDTO, email);
 
+        NotificationEntity notificationEntity = NotificationEntity
+                .builder()
+                .sendEmail(email) //보낸사람
+                .revEmail(inviteDTO.getEmail()) //캘린더구독자들
+                .comment(email + "님이 " + "[ " + inviteDTO.getName() + " ] 캘린더를 공유했습니다.") //
+                .type("subscribe") // 캘린더구독
+                .calendarEntity(CalendarEntity.builder().calNo(inviteDTO.getCalNo()).build())
+                .build();
+        notificationService.create(notificationEntity);
         // EmailResponseDTO emailResponseDTO = new EmailResponseDTO();
         // emailResponseDTO.setCode(code);
         log.warn("code:::::", data);
