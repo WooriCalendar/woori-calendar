@@ -2,6 +2,7 @@ package com.ceojun7.wooricalendar.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.management.Notification;
@@ -205,8 +206,8 @@ public class ShareController {
     dto.setGrade(Long.parseLong(grade));
 
     List<ShareEntity> entities = service.retrieveByEmail(receiver);
-    for (int i = 0; i < entities.size(); i++) {
-      if (entities.get(i).getCalendarEntity().getCalNo() == longCalNo) {
+    for (ShareEntity shareEntity : entities) {
+      if (Objects.equals(shareEntity.getCalendarEntity().getCalNo(), longCalNo)) {
         log.info("이미 구독하고있습니다.");
         response.sendRedirect("http://localhost:3000/");
         return null;
