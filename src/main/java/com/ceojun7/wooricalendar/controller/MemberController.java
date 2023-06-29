@@ -381,6 +381,15 @@ public class MemberController {
         return new ResponseEntity<>("회원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * methodName : deleteMember
+     * comment : 회원삭제
+     * author : 강태수, DGeon
+     * date : 2023-06-24
+     * description :
+     *
+     * @param email the email
+     */
     @DeleteMapping
     @Transactional
     public void deleteMember(@AuthenticationPrincipal String email){
