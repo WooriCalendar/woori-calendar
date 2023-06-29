@@ -97,11 +97,20 @@ public class MemberController {
                     .language(memberDTO.getLanguage().substring(0, 2))
                     .build();
             MemberEntity registeredMember = memberService.create(member);
+            String zone;
+            if(member.getLanguage().equals("ko")){
+                 zone = "Asia/Seoul";
+            }else if(member.getLanguage().equals("ja")){
+                zone = "Asia/Tokyo";
+            }else{
+                zone = "America/New_York";
+            }
             CalendarEntity calendar = CalendarEntity.builder()
                     .name(memberDTO.getEmail().substring(0, memberDTO.getEmail().indexOf("@")))
                     .regdate(new Date())
                     .updatedate(new Date())
-                    // .timezone()
+                    .timezone(zone)
+                    .color("#7bc6ff")
                     .build();
             calendarService.create(calendar);
             ShareEntity shareEntity = ShareEntity.builder().calendarEntity(calendar)
