@@ -85,7 +85,6 @@ public class EmailController {
 
         EmailResponseDTO emailResponseDto = new EmailResponseDTO();
         emailResponseDto.setCode(code);
-        log.warn(code);
         return ResponseEntity.ok(emailResponseDto);
     }
 
@@ -130,7 +129,6 @@ public class EmailController {
 
         EmailResponseDTO emailResponseDto = new EmailResponseDTO();
         emailResponseDto.setCode(code);
-        log.warn(code);
         return ResponseEntity.ok(emailResponseDto);
     }
 
@@ -156,18 +154,26 @@ public class EmailController {
                 .to(inviteDTO.getEmail())
                 .subject(email + "님이 " + "[ " + inviteDTO.getName() + " ] 캘린더를 공유했습니다.")
                 .build();
+        Map<String, Object> data = null;
+        if(inviteDTO.getEmail().toLowerCase().equals("ko")) {
+             data = emailService.sendInviteMail(emailMessage, "ko-invite", inviteDTO, email);
+        }else if(inviteDTO.getEmail().toLowerCase().equals("ja")) {
+            data = emailService.sendInviteMail(emailMessage, "ja-invite", inviteDTO, email);
+        }else{
+            data = emailService.sendInviteMail(emailMessage, "en-invite", inviteDTO, email);
+        }
 
-        Map<String, Object> data = emailService.sendInviteMail(emailMessage, "invite", inviteDTO, email);
+
 
         // EmailResponseDTO emailResponseDTO = new EmailResponseDTO();
         // emailResponseDTO.setCode(code);
-        log.warn("code:::::", data);
+//        log.warn("code:::::", data);
         // log.warn(code);
-        log.warn("==================테스트==================");
-        log.warn(inviteDTO.getEmail());
-        log.warn(inviteDTO.getName());
-        log.warn("calNo:" + inviteDTO.getCalNo());
-        log.warn("grade:" + inviteDTO.getGrade());
+//        log.warn("==================테스트==================");
+//        log.warn(inviteDTO.getEmail());
+//        log.warn(inviteDTO.getName());
+//        log.warn("calNo:" + inviteDTO.getCalNo());
+//        log.warn("grade:" + inviteDTO.getGrade());
 
         return ResponseEntity.ok(data);
     }
@@ -211,7 +217,7 @@ public class EmailController {
 
         EmailResponseDTO emailResponseDto = new EmailResponseDTO();
         emailResponseDto.setCode(code);
-        log.warn(code);
+//        log.warn(code);
         return ResponseEntity.ok(emailResponseDto);
     }
 }
