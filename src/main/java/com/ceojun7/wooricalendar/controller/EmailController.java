@@ -59,8 +59,6 @@ public class EmailController {
     // 임시 비밀번호 발급
     @PostMapping("/password")
     public ResponseEntity<?> sendPasswordMail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
-        log.warn(String.valueOf(emailPostDto));
-        log.warn("언어"+emailPostDto.getLanguage());
 
         String code = null;
         if(emailPostDto.getLanguage().toLowerCase().equals("ko-kr")) {
@@ -101,8 +99,6 @@ public class EmailController {
      */
     @PostMapping("/email")
     public ResponseEntity<?> sendJoinMail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
-        log.warn(String.valueOf(emailPostDto));
-        log.warn("언어"+emailPostDto.getLanguage());
 
         String code = null;
         if(emailPostDto.getLanguage().toLowerCase().equals("ko-kr")) {
@@ -148,7 +144,6 @@ public class EmailController {
     public ResponseEntity<?> sendInviteMail(@RequestBody InviteDTO inviteDTO, @AuthenticationPrincipal String email)
             throws MessagingException {
 
-        log.warn("테스트::::::::::" + String.valueOf(inviteDTO.getEmail()));
 
         EmailMessageEntity emailMessage = EmailMessageEntity.builder()
                 .to(inviteDTO.getEmail())
@@ -191,8 +186,6 @@ public class EmailController {
      */
     @PostMapping("/subemail")
     public ResponseEntity<?> sendForgotEmail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
-        log.warn(String.valueOf(emailPostDto));
-        log.warn("언어"+emailPostDto.getLanguage());
 
         String code = null;
         if(emailPostDto.getLanguage().toLowerCase().equals("ko-kr")) {

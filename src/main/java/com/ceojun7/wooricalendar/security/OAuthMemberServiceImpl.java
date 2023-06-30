@@ -56,10 +56,10 @@ public class OAuthMemberServiceImpl extends DefaultOAuth2UserService {
         }
 
         final String authProvider = userRequest.getClientRegistration().getClientName();
-        log.info("{}", authProvider);
+//        log.info("{}", authProvider);
 
         final String language = oAuth2User.getAttribute("locale");
-        log.warn("language::::::{}", language);
+//        log.warn("language::::::{}", language);
         String email = null;
         if (authProvider.equalsIgnoreCase("google")) {
             email = (String) oAuth2User.getAttribute("email");
@@ -106,7 +106,7 @@ public class OAuthMemberServiceImpl extends DefaultOAuth2UserService {
             memberEntity = memberRepository.findByEmail(email);
         }
 
-        log.info("success pulled member info member {}, authProvider {}", email, authProvider);
+//        log.info("success pulled member info member {}, authProvider {}", email, authProvider);
         return new ApplicationOAuth2User(memberEntity.getEmail(), oAuth2User.getAttributes());
     }
 

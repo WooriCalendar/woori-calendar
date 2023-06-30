@@ -34,7 +34,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         String token = new TokenProvider().create(authentication);
-        log.info(token);
+//        log.info(token);
 
         Optional<Cookie> oCookie = Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals(RedirectUrlCookieFilter.REDIRECT_URI_PARAM)).findFirst();

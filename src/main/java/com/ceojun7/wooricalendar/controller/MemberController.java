@@ -80,7 +80,6 @@ public class MemberController {
      */
     @PostMapping("signup")
     public ResponseEntity<?> registerMember(@RequestBody MemberDTO memberDTO, CalendarDTO calendarDTO) {
-        log.warn("사인업호출됨");
         try {
             if (memberDTO == null || memberDTO.getPassword() == null) {
                 throw new RuntimeException("Invalid Password value.");
@@ -160,14 +159,14 @@ public class MemberController {
      */
     @PostMapping("signin")
     public ResponseEntity<?> authenticate(@RequestBody MemberDTO memberDTO) {
-        log.info("{}", memberDTO);
+//        log.info("{}", memberDTO);
         MemberEntity member = memberService.getByCredentials(memberDTO.getEmail(), memberDTO.getPassword(),
                 passwordEncoder);
-        log.info("{}", member);
+//        log.info("{}", member);
         if (member != null) {
             // 토큰생성
             final String token = tokenProvider.create(member);
-            log.info("발급 토큰 : {}", token);
+//            log.info("발급 토큰 : {}", token);
             final MemberDTO responseUserDTO = memberDTO.builder()
                     .email(member.getEmail())
                     .token(token)
@@ -198,7 +197,7 @@ public class MemberController {
     public ResponseEntity<?> checkPassword(@RequestBody MemberDTO memberDTO) {
         MemberEntity member = memberService.getByCredentials(memberDTO.getEmail(), memberDTO.getPassword(),
                 passwordEncoder);
-        log.info("{}", member);
+//        log.info("{}", member);
         return ResponseEntity.ok().body(member);
         // if (member != null) {
         // final MemberDTO responseUserDTO = memberDTO.builder()
@@ -278,13 +277,13 @@ public class MemberController {
             MemberEntity member = null;
             MemberDTO responseMemberDTO = null;
                 if(memberDTO.getEmail() != null) {
-                    log.warn("email 중복검사 :: get호출됨 :: " + memberDTO.getEmail());
+//                    log.warn("email 중복검사 :: get호출됨 :: " + memberDTO.getEmail());
                     member = memberService.findByEmail(memberDTO.getEmail());
                     responseMemberDTO = memberDTO.builder()
                             .email(member.getEmail())
                             .build();
                 }else if(memberDTO.getSubemail() != null){
-                    log.warn("subemail 호출::"+memberDTO.getSubemail());
+//                    log.warn("subemail 호출::"+memberDTO.getSubemail());
                     if(memberService.findBySubEmail(memberDTO.getSubemail()) !=null) {
                         member = memberService.findBySubEmail(memberDTO.getSubemail());
 
@@ -328,7 +327,7 @@ public class MemberController {
                     }
             return ResponseEntity.ok().body(responseMemberDTO);
         } catch (NullPointerException nullPointerException) {
-            log.warn("nullPoint");
+//            log.warn("nullPoint");
             MemberDTO reMemberDTO = memberDTO.builder().build();
             return ResponseEntity.ok().body(reMemberDTO);
         }
