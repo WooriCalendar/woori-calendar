@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <hr style="border: 2px solid rgb(3, 199, 90)">
+    <br />
+    <br />
+    <div style="justify-content: center">
+      <div style="margin: 100px; display: flex; justify-content: space-between">
+        <main style="width: 48%">
+          <div style="width: max-content">
+            <div>Woori Calendar</div>
+            <br />
+            <br />
+            <p>
+              <b th:text="${data.receiver}">Hello test@woori.com</b><br /><br />
+              <b th:text="${data.sender}"></b> by<br />
+              <b th:text="${data.name}">'Our shared calendar'</b> about our calendar in writing<br />
+              <b th:text="${data.gradeString}"></b> Notice that permission has been granted.<br />
+              <input type="hidden" th:value="${data.calNo}"/>
+
+              After adding this calendar to other calendars<br />
+              You can hide it or delete it completely at any time.
+            </p>
+            <br/>
+            
+            <a th:href="@{'http://localhost:8080/share/' + ${data.calNo} + '/' + ${data.receiver} + '/' + ${data.grade}}">
+              <button type="button" 
+                      style="background-color: #4CAF50;
+                            border: none;
+                            color: white;
+                            padding: 12px 23px;
+                            border-radius: 5px;
+                            text-align: center;
+                            text-decoration: none;
+                            display: inline-block;
+                            font-size: 16px;
+                            margin: 4px 2px;
+                            cursor: pointer;">
+                accept
+              </button>
+            </a>
+            <br />
+          </div>
+        </main>
+        <aside style="width: 48%">
+          <di style="width: max-content">
+            <img src="cid:logo" style="width: 300px" />
+          </di>
+        </aside>
+      </div>
+    </div>
+
+    <hr style="border: 2px solid rgb(3, 199, 90)" />
+    <div align="center">
+      <sapn>Copyright &copy; Woori Calendar</sapn>
+    </div>
+  </body>
+</html>
