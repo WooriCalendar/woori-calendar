@@ -138,7 +138,7 @@ public class EmailController {
      * date : 2023-06-19
      * description :
      *
-     * @param emailPostDto the email post dto
+     * @param inviteDTO the email post dto
      * @param inviteDTO
      * @return response entity
      * @throws MessagingException the messaging exception
