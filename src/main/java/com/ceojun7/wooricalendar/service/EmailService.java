@@ -100,7 +100,7 @@ public class EmailService {
     }
 
     public Map<String, Object> sendInviteMail(EmailMessageEntity emailMessage, String type, InviteDTO inviteDTO,
-            String email)
+            String email, String language)
             throws MessagingException {
 
         final String token = tokenProvider.create(memberRepository.findByEmail(inviteDTO.getEmail()));
@@ -115,11 +115,29 @@ public class EmailService {
         data.put("grade", inviteDTO.getGrade());
         String gradeSet = "";
         if (inviteDTO.getGrade() == 0) {
-            gradeSet = "보기";
+            if(language.equals("ko")) {
+                gradeSet = " 보기 ";
+            }else if(language.equals("ja")){
+                gradeSet = " ビュー ";
+            }else{
+                gradeSet = " view ";
+            }
         } else if (inviteDTO.getGrade() == 1) {
-            gradeSet = "편집";
+            if(language.equals("ko")) {
+                gradeSet = " 편집 ";
+            }else if(language.equals("ja")){
+                gradeSet = " 編集 ";
+            }else{
+                gradeSet = " edit ";
+            }
         } else if (inviteDTO.getGrade() == 2) {
-            gradeSet = "관리";
+            if(language.equals("ko")) {
+                gradeSet = " 관리 ";
+            }else if(language.equals("ja")){
+                gradeSet = " 管理 ";
+            }else{
+                gradeSet = " management ";
+            }
         }
         data.put("gradeString", gradeSet);
 

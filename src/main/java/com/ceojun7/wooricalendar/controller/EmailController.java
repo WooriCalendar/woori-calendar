@@ -9,6 +9,7 @@ import com.ceojun7.wooricalendar.model.EmailMessageEntity;
 import com.ceojun7.wooricalendar.model.NotificationEntity;
 import com.ceojun7.wooricalendar.service.CalendarService;
 import com.ceojun7.wooricalendar.service.EmailService;
+import com.ceojun7.wooricalendar.service.MemberService;
 import com.ceojun7.wooricalendar.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,7 @@ import javax.mail.MessagingException;
 @Slf4j
 public class EmailController {
     private final EmailService emailService;
-
+    private final MemberService memberService;
     private final NotificationService notificationService;
 
     /**
@@ -63,8 +64,6 @@ public class EmailController {
     // 임시 비밀번호 발급
     @PostMapping("/password")
     public ResponseEntity<?> sendPasswordMail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
-        log.warn(String.valueOf(emailPostDto));
-        log.warn("언어"+emailPostDto.getLanguage());
 
         String code = null;
         if(emailPostDto.getLanguage().toLowerCase().equals("ko-kr")) {
@@ -105,8 +104,6 @@ public class EmailController {
      */
     @PostMapping("/email")
     public ResponseEntity<?> sendJoinMail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
-        log.warn(String.valueOf(emailPostDto));
-        log.warn("언어"+emailPostDto.getLanguage());
 
         String code = null;
         if(emailPostDto.getLanguage().toLowerCase().equals("ko-kr")) {
@@ -141,7 +138,7 @@ public class EmailController {
      * date : 2023-06-19
      * description :
      *
-     * @param emailPostDto the email post dto
+     * @param inviteDTO the email post dto
      * @param inviteDTO
      * @return response entity
      * @throws MessagingException the messaging exception
@@ -150,19 +147,28 @@ public class EmailController {
     public ResponseEntity<?> sendInviteMail(@RequestBody InviteDTO inviteDTO, @AuthenticationPrincipal String email)
             throws MessagingException {
 
-        log.warn("테스트::::::::::" + String.valueOf(inviteDTO.getEmail()));
 
-        EmailMessageEntity emailMessage = EmailMessageEntity.builder()
-                .to(inviteDTO.getEmail())
-                .subject(email + "님이 " + '"' + inviteDTO.getName() + '"' + "캘린더를 공유했습니다.")
-                .build();
+        EmailMessageEntity emailMessage = null;
         Map<String, Object> data = null;
-        if(inviteDTO.getEmail().toLowerCase().equals("ko")) {
-             data = emailService.sendInviteMail(emailMessage, "ko-invite", inviteDTO, email);
-        }else if(inviteDTO.getEmail().toLowerCase().equals("ja")) {
-            data = emailService.sendInviteMail(emailMessage, "ja-invite", inviteDTO, email);
+        String language = memberService.findByEmail(inviteDTO.getEmail()).getLanguage().toLowerCase();
+        if(language.equals("ko")) {
+            emailMessage = EmailMessageEntity.builder()
+                    .to(inviteDTO.getEmail())
+                    .subject(email + "님이 " + '"' + inviteDTO.getName() + '"' + "캘린더를 공유했습니다.")
+                    .build();
+             data = emailService.sendInviteMail(emailMessage, "ko-invite", inviteDTO, email, language);
+        }else if(language.equals("ja")) {
+            emailMessage = EmailMessageEntity.builder()
+                    .to(inviteDTO.getEmail())
+                    .subject(email + "様が " + '"' + inviteDTO.getName() + '"' + "カレンダーを共有しました。.")
+                    .build();
+            data = emailService.sendInviteMail(emailMessage, "ja-invite", inviteDTO, email, language);
         }else{
-            data = emailService.sendInviteMail(emailMessage, "en-invite", inviteDTO, email);
+            emailMessage = EmailMessageEntity.builder()
+                    .to(inviteDTO.getEmail())
+                    .subject(email + "is " + '"' + inviteDTO.getName() + '"' + "You shared your calendar..")
+                    .build();
+            data = emailService.sendInviteMail(emailMessage, "en-invite", inviteDTO, email, language);
         }
 
 
@@ -202,8 +208,6 @@ public class EmailController {
      */
     @PostMapping("/subemail")
     public ResponseEntity<?> sendForgotEmail(@RequestBody EmailPostDTO emailPostDto) throws MessagingException {
-        log.warn(String.valueOf(emailPostDto));
-        log.warn("언어"+emailPostDto.getLanguage());
 
         String code = null;
         if(emailPostDto.getLanguage().toLowerCase().equals("ko-kr")) {

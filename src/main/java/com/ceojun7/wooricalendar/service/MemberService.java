@@ -48,7 +48,7 @@ public class MemberService {
         }
         final String email = memberEntity.getEmail();
         if (memberRepository.existsByEmail(email)) {
-            log.warn("Username already exists {}", email);
+//            log.warn("Username already exists {}", email);
             throw new RuntimeException("Username already exists");
         }
         return memberRepository.save(memberEntity);
@@ -135,7 +135,6 @@ public class MemberService {
      */
     public List<String> findeamil() {
         List<MemberEntity> entityList = memberRepository.findAll();
-        log.warn("{}", entityList);
         return entityList.stream()
                 .map(MemberEntity::getEmail)
                 .collect(Collectors.toList());
@@ -160,7 +159,7 @@ public class MemberService {
     public MemberEntity findByEmail(String email){
 
         MemberEntity memberEntity = memberRepository.findByEmail(email);
-        log.warn("서비스{}", memberEntity.getEmail());
+//        log.warn("서비스{}", memberEntity.getEmail());
         return memberEntity;
     }
 
@@ -188,8 +187,7 @@ public class MemberService {
     public MemberEntity findBySubEmail(String email){
 
         MemberEntity memberEntity = memberRepository.findBySubemail(email);
-        log.warn("서비스 subemail{}",memberEntity.getEmail());
-        log.warn("서비스는 왔는데" + memberEntity);
+//        log.warn("서비스 subemail{}",memberEntity.getEmail());
         return memberEntity;
     }
 

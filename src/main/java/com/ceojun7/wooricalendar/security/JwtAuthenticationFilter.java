@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (token != null && !token.equalsIgnoreCase("null")) {
                 String memberId = tokenProvider.validateAndGetId(token);
-                log.info("Authenticated userId : {}" , memberId);
+//                log.info("Authenticated userId : {}" , memberId);
 
                 AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberId, null,
                         AuthorityUtils.NO_AUTHORITIES);
@@ -67,12 +67,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String parseBearerToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         // Bearer: .... / 난수형태의 토큰값
-        log.info("bearerToken : {}", bearerToken);
+//        log.info("bearerToken : {}", bearerToken);
 
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             // 토큰이 있으면 리턴
             String token = bearerToken.substring(7);
-            log.info("read token {}", token);
+//            log.info("read token {}", token);
             return token;
         }
         return null;

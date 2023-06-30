@@ -80,7 +80,6 @@ public class MemberController {
      */
     @PostMapping("signup")
     public ResponseEntity<?> registerMember(@RequestBody MemberDTO memberDTO, CalendarDTO calendarDTO) {
-        log.warn("사인업호출됨");
         try {
             if (memberDTO == null || memberDTO.getPassword() == null) {
                 throw new RuntimeException("Invalid Password value.");
@@ -160,14 +159,14 @@ public class MemberController {
      */
     @PostMapping("signin")
     public ResponseEntity<?> authenticate(@RequestBody MemberDTO memberDTO) {
-        log.info("{}", memberDTO);
+//        log.info("{}", memberDTO);
         MemberEntity member = memberService.getByCredentials(memberDTO.getEmail(), memberDTO.getPassword(),
                 passwordEncoder);
-        log.info("{}", member);
+//        log.info("{}", member);
         if (member != null) {
             // 토큰생성
             final String token = tokenProvider.create(member);
-            log.info("발급 토큰 : {}", token);
+//            log.info("발급 토큰 : {}", token);
             final MemberDTO responseUserDTO = memberDTO.builder()
                     .email(member.getEmail())
                     .token(token)
@@ -198,7 +197,7 @@ public class MemberController {
     public ResponseEntity<?> checkPassword(@RequestBody MemberDTO memberDTO) {
         MemberEntity member = memberService.getByCredentials(memberDTO.getEmail(), memberDTO.getPassword(),
                 passwordEncoder);
-        log.info("{}", member);
+//        log.info("{}", member);
         return ResponseEntity.ok().body(member);
         // if (member != null) {
         // final MemberDTO responseUserDTO = memberDTO.builder()
@@ -278,13 +277,13 @@ public class MemberController {
             MemberEntity member = null;
             MemberDTO responseMemberDTO = null;
                 if(memberDTO.getEmail() != null) {
-                    log.warn("email 중복검사 :: get호출됨 :: " + memberDTO.getEmail());
+//                    log.warn("email 중복검사 :: get호출됨 :: " + memberDTO.getEmail());
                     member = memberService.findByEmail(memberDTO.getEmail());
                     responseMemberDTO = memberDTO.builder()
                             .email(member.getEmail())
                             .build();
                 }else if(memberDTO.getSubemail() != null){
-                    log.warn("subemail 호출::"+memberDTO.getSubemail());
+//                    log.warn("subemail 호출::"+memberDTO.getSubemail());
                     if(memberService.findBySubEmail(memberDTO.getSubemail()) !=null) {
                         member = memberService.findBySubEmail(memberDTO.getSubemail());
 
@@ -328,7 +327,7 @@ public class MemberController {
                     }
             return ResponseEntity.ok().body(responseMemberDTO);
         } catch (NullPointerException nullPointerException) {
-            log.warn("nullPoint");
+//            log.warn("nullPoint");
             MemberDTO reMemberDTO = memberDTO.builder().build();
             return ResponseEntity.ok().body(reMemberDTO);
         }
@@ -468,7 +467,7 @@ public class MemberController {
     public void cal(ScheduleDTO scheduleDTO, String email) throws IOException, ParseException {
         String AnniversaryInfo = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getAnniversaryInfo";
         String HoliDeInfo = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getHoliDeInfo";
-        StringBuilder urlBuilder = new StringBuilder(HoliDeInfo); /*URL*/
+        StringBuilder urlBuilder = new StringBuilder(AnniversaryInfo); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=4chyTuzqZyZy3L0j6TzepfD0SEeHJM5J7yGtEX%2F8HQeD4fZofd%2B%2FseXdgoveey8ibGuH9KHKmqTkZc3ztsbvVQ%3D%3D"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
         urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("100", "UTF-8")); /*한 페이지 결과 수*/
