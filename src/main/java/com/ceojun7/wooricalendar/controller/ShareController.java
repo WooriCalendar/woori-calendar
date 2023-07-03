@@ -209,7 +209,7 @@ public class ShareController {
     for (ShareEntity shareEntity : entities) {
       if (Objects.equals(shareEntity.getCalendarEntity().getCalNo(), longCalNo)) {
         log.info("이미 구독하고있습니다.");
-        response.sendRedirect("http://localhost:3000/");
+        response.sendRedirect("https://woori.kseolha.com/");
         return null;
       }
     }
@@ -220,7 +220,7 @@ public class ShareController {
 
     ShareEntity entity = ShareDTO.toEntity(dto);
     service.create(entity);
-    response.sendRedirect("http://localhost:3000/");
+    response.sendRedirect("https://woori.kseolha.com/");
 
     for(int i=0; i < shareEntityList.size(); i++){
       NotificationEntity notificationEntity = NotificationEntity

@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *              2023.06.20 seolha86 retrieveScheduleByScNo 추가
  */
 @RestController
-@RequestMapping("schedule")
+@RequestMapping("/schedule")
 @Slf4j
 public class ScheduleController {
     @Autowired

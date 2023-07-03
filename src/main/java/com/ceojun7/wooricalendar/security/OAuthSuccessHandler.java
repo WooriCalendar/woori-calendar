@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private static final String LOCAL_REDIRECT_URL = "http://localhost:3000";
+    private static final String LOCAL_REDIRECT_URL = "http://18.224.7.38";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

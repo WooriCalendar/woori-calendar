@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -37,9 +38,9 @@ public class ScheduleDTO {
     private String title;
     private String comment;
     private String place;
-//    private Timestamp startTime;
+    //    private Timestamp startTime;
 //    private Timestamp endTime;
-    private String  start;
+    private String start;
     private String end;
     private Date regDate;
     private Date updateDate;
@@ -52,6 +53,8 @@ public class ScheduleDTO {
     private boolean status;
 
     private String dayOfWeek;
+
+    private boolean allDay;
 
 //    public ScheduleDTO(Long scNo, String title, String comment, String place, String start, String end, Date regDate, Date updateDate, Long calNo) {
 //        this.scNo = scNo;
@@ -75,16 +78,29 @@ public class ScheduleDTO {
             SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             this.start = dtFormat.format(entity.getStartDate());
-            this.end = dtFormat.format(entity.getEndDate()).substring(0, dtFormat.format(entity.getEndDate()).length() - 2) + (Integer.parseInt(dtFormat.format(entity.getEndDate()).substring(dtFormat.format(entity.getEndDate()).length() - 2)) + 1);
+            this.end = dtFormat.format(entity.getEndDate());
+            this.allDay = true;
+
+//            Calendar cal = Calendar.getInstance();
+//            cal.set(entity.getEndDate().getYear(), entity.getEndDate().getMonth() - 1, entity.getEndDate().getDate());
+//
+//            if (entity.getEndDate().getDate() == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+//                entity.getEndDate().setDate(1);
+//                cal.set(entity.getEndDate().getYear(), entity.getEndDate().getMonth(), entity.getEndDate().getDate());
+//                this.end = dtFormat.format(cal.getTime());
+//            } else {
+//                this.end = dtFormat.format(entity.getEndDate()).substring(0, dtFormat.format(entity.getEndDate()).length() - 2) +
+//                        (Integer.parseInt(dtFormat.format(entity.getEndDate()).substring(dtFormat.format(entity.getEndDate()).length() - 2)) + 1);
+//            }
 
             if (entity.getCalendarEntity().getCalNo() != 90 && entity.getCalendarEntity().getCalNo() != 98) {
-                LocalDate date = LocalDate.of(entity.getStartDate().getYear(), entity.getStartDate().getMonth(), entity.getStartDate().getDate() -2);
+                LocalDate date = LocalDate.of(entity.getStartDate().getYear(), entity.getStartDate().getMonth(), entity.getStartDate().getDate());
                 DayOfWeek day = date.getDayOfWeek();
 
                 this.dayOfWeek = day.getDisplayName(TextStyle.SHORT, Locale.US);
             }
         } else {
-            LocalDate date = LocalDate.of(entity.getStartTime().getYear(), entity.getStartTime().getMonth(), entity.getStartTime().getDate() -2);
+            LocalDate date = LocalDate.of(entity.getStartTime().getYear(), entity.getStartTime().getMonth(), entity.getStartTime().getDate());
             DayOfWeek day = date.getDayOfWeek();
 
             this.start = String.valueOf(entity.getStartTime());
@@ -101,6 +117,8 @@ public class ScheduleDTO {
         if (entity.getRePeriod() != null) {
             this.rrule = new RRuleDTO(entity);
         }
+
+//        this.isExclusive = true;
     }
 
     public static ScheduleEntity toEntity(final ScheduleDTO dto) {
@@ -123,3 +141,24 @@ public class ScheduleDTO {
         }
     }
 }
+
+//    public static ScheduleEntity toEntity(final ScheduleDTO dto) {
+//        if (dto.getRrule().getFreq() == null && dto.status) {
+//            return ScheduleEntity.builder().scNo(dto.getScNo()).name(dto.getTitle()).comment(dto.getComment()).place(dto.getPlace())
+//                    .startDate(Timestamp.valueOf(dto.getStart() + " 00:00:00")).endDate(Timestamp.valueOf(dto.getEnd() + " 00:00:00"))
+//                    .calendarEntity(CalendarEntity.builder().calNo(dto.getCalNo()).build()).build();
+//        } else if (dto.getRrule().getFreq() == null && !dto.status) {
+//            return ScheduleEntity.builder().scNo(dto.getScNo()).name(dto.getTitle()).comment(dto.getComment()).place(dto.getPlace())
+//                    .startTime(Timestamp.valueOf(dto.getStart())).endTime(Timestamp.valueOf(dto.getEnd()))
+//                    .calendarEntity(CalendarEntity.builder().calNo(dto.calNo).build()).build();
+//        } else if (dto.getRrule().getFreq() != null && dto.status) {
+//            return ScheduleEntity.builder().scNo(dto.getScNo()).name(dto.getTitle()).comment(dto.getComment()).place(dto.getPlace())
+//                    .startDate(Timestamp.valueOf(dto.getStart() + " 00:00:00")).endDate(Timestamp.valueOf(dto.getEnd() + " 00:00:00"))
+//                    .calendarEntity(CalendarEntity.builder().calNo(dto.getCalNo()).build()).reEndDate(Timestamp.valueOf(dto.getRrule().getUntil() + " 00:00:00")).rePeriod(dto.getRrule().getFreq()).build();
+//        } else {
+//            return ScheduleEntity.builder().scNo(dto.getScNo()).name(dto.getTitle()).comment(dto.getComment()).place(dto.getPlace())
+//                    .startTime(Timestamp.valueOf(dto.getStart())).endTime(Timestamp.valueOf(dto.getEnd()))
+//                    .calendarEntity(CalendarEntity.builder().calNo(dto.calNo).build()).reEndDate(Timestamp.valueOf(dto.rrule.getUntil() + " 00:00:00")).rePeriod(dto.getRrule().getFreq()).build();
+//        }
+//    }
+

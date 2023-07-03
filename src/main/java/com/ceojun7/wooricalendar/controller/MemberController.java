@@ -53,7 +53,7 @@ import java.util.List;
  *              2023-06-04 강태수 getMemberByEmail,updateMember 생성
  **/
 @RestController
-@RequestMapping("member")
+@RequestMapping("/member")
 @Slf4j
 @RequiredArgsConstructor
 public class MemberController {
@@ -467,11 +467,11 @@ public class MemberController {
     public void cal(ScheduleDTO scheduleDTO, String email) throws IOException, ParseException {
         String AnniversaryInfo = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getAnniversaryInfo";
         String HoliDeInfo = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getHoliDeInfo";
-        StringBuilder urlBuilder = new StringBuilder(AnniversaryInfo); /*URL*/
+        StringBuilder urlBuilder = new StringBuilder(HoliDeInfo); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=4chyTuzqZyZy3L0j6TzepfD0SEeHJM5J7yGtEX%2F8HQeD4fZofd%2B%2FseXdgoveey8ibGuH9KHKmqTkZc3ztsbvVQ%3D%3D"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
         urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("100", "UTF-8")); /*한 페이지 결과 수*/
-        urlBuilder.append("&" + URLEncoder.encode("solYear", "UTF-8") + "=" + URLEncoder.encode("2024", "UTF-8")); /*연*/
+        urlBuilder.append("&" + URLEncoder.encode("solYear", "UTF-8") + "=" + URLEncoder.encode("2023", "UTF-8")); /*연*/
 //        urlBuilder.append("&" + URLEncoder.encode("solMonth", "UTF-8") + "=" + URLEncoder.encode("06", "UTF-8")); /*월*/
         URL url = new URL(urlBuilder.toString());
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
